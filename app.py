@@ -20,9 +20,7 @@ PATHWAYS = [def load_pathways():
     with open("data/pathways.json", "r", encoding="utf-8") as file:
         return json.load(file)
 
-
 PATHWAYS = load_pathways()
-    
 ]
 
 
