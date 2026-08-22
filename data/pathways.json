@@ -1,0 +1,18 @@
+[
+  {
+    "career": "Software Engineer",
+    "routes": ["Degree Apprenticeship", "University"],
+    "subjects": ["Computer Science", "Maths"],
+    "skills": ["Programming", "Problem Solving", "Logical Thinking"],
+    "description": "Design, develop, test and maintain software applications and systems.",
+    "skills_to_develop": ["Python", "Git and GitHub", "Data Structures and Algorithms", "SQL"]
+  },
+  {
+    "career": "Cybersecurity Analyst",
+    "routes": ["Degree Apprenticeship", "University"],
+    "subjects": ["Computer Science", "Maths"],
+    "skills": ["Problem Solving", "Logical Thinking"],
+    "description": "Protect systems and data from cyber threats and breaches.",
+    "skills_to_develop": ["Network Security", "Python", "Cryptography", "Risk Assessment"]
+  }
+]
