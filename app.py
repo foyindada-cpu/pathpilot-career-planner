@@ -15,13 +15,13 @@ Author: Foyin Dada
 # PATHWAY DATA
 # -----------------------------
 
-PATHWAYS = [def load_pathways():
+PATHWAYS = def load_pathways():
     """Load career pathway data from the JSON dataset."""
     with open("data/pathways.json", "r", encoding="utf-8") as file:
         return json.load(file)
 
 PATHWAYS = load_pathways()
-]
+
 
 
 # -----------------------------
