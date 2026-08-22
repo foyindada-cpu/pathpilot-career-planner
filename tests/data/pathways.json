@@ -1,0 +1,119 @@
+[
+  {
+    "career": "Software Engineer",
+    "routes": [
+      "Degree Apprenticeship",
+      "University"
+    ],
+    "subjects": [
+      "Computer Science",
+      "Maths"
+    ],
+    "skills": [
+      "Programming",
+      "Problem Solving",
+      "Logical Thinking"
+    ],
+    "description": "Design, develop, test and maintain software applications and systems.",
+    "skills_to_develop": [
+      "Python",
+      "Git and GitHub",
+      "Data Structures and Algorithms",
+      "SQL"
+    ]
+  },
+  {
+    "career": "Cybersecurity Analyst",
+    "routes": [
+      "Degree Apprenticeship",
+      "University"
+    ],
+    "subjects": [
+      "Computer Science",
+      "Maths"
+    ],
+    "skills": [
+      "Problem Solving",
+      "Logical Thinking",
+      "Cybersecurity"
+    ],
+    "description": "Protect computer systems, networks and data from security threats.",
+    "skills_to_develop": [
+      "Networking",
+      "Python",
+      "Linux",
+      "Cybersecurity Fundamentals"
+    ]
+  },
+  {
+    "career": "Data Scientist",
+    "routes": [
+      "University",
+      "Degree Apprenticeship"
+    ],
+    "subjects": [
+      "Maths",
+      "Computer Science",
+      "Economics"
+    ],
+    "skills": [
+      "Mathematics",
+      "Programming",
+      "Data Analysis"
+    ],
+    "description": "Use data, statistics and programming to identify patterns and solve problems.",
+    "skills_to_develop": [
+      "Python",
+      "Statistics",
+      "SQL",
+      "Machine Learning"
+    ]
+  },
+  {
+    "career": "Investment Analyst",
+    "routes": [
+      "University",
+      "Degree Apprenticeship"
+    ],
+    "subjects": [
+      "Maths",
+      "Economics"
+    ],
+    "skills": [
+      "Mathematics",
+      "Data Analysis",
+      "Communication"
+    ],
+    "description": "Analyse financial information and markets to support investment decisions.",
+    "skills_to_develop": [
+      "Financial Modelling",
+      "Excel",
+      "Python",
+      "Financial Markets"
+    ]
+  },
+  {
+    "career": "Business Analyst",
+    "routes": [
+      "University",
+      "Degree Apprenticeship"
+    ],
+    "subjects": [
+      "Maths",
+      "Economics",
+      "Computer Science"
+    ],
+    "skills": [
+      "Problem Solving",
+      "Communication",
+      "Data Analysis"
+    ],
+    "description": "Analyse business problems and help organisations improve their processes and technology.",
+    "skills_to_develop": [
+      "SQL",
+      "Data Visualisation",
+      "Requirements Analysis",
+      "Communication"
+    ]
+  }
+]
