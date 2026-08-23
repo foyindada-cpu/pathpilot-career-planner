@@ -1,10 +1,6 @@
 import streamlit as st
 from datetime import datetime
-
-# ==============================================
-# YOUR SHEET ID — ALREADY FILLED IN! ✅
-# ==============================================
-SHEET_ID = "1XFLfhDqtm8whNVZsAppokGzLt0AAPrgv7fY_y0ENrIQ"
+import pandas as pd
 
 # ------------------------------
 # PAGE SETUP
@@ -38,11 +34,47 @@ PATHWAYS = [
 ]
 
 # ------------------------------
-# MAIN APP
+# INITIALIZE SESSION STATE TO STORE ALL RESPONSES
+# ------------------------------
+if "all_responses" not in st.session_state:
+    st.session_state.all_responses = []
+
+# ------------------------------
+# ADMIN SECTION — HIDDEN FROM USERS
+# ------------------------------
+def admin_panel():
+    st.subheader("🔒 Admin — All Responses")
+    st.info("Only you can see this!")
+    
+    if len(st.session_state.all_responses) == 0:
+        st.write("No responses yet.")
+    else:
+        # Show all responses in a table
+        df = pd.DataFrame(st.session_state.all_responses)
+        st.dataframe(df, use_container_width=True)
+        
+        # Download ALL data as CSV
+        csv = df.to_csv(index=False)
+        st.download_button(
+            label="📥 DOWNLOAD ALL RESPONSES",
+            data=csv,
+            file_name=f"PathPilot_All_Responses_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+            mime="text/csv"
+        )
+
+# ------------------------------
+# MAIN APP — WHAT USERS SEE
 # ------------------------------
 st.title("🎯 PathPilot — Career & Education Pathway Planner")
 st.subheader("Discover your perfect Degree Apprenticeship or University route!")
 st.markdown("---")
+
+# Check if admin mode
+admin_mode = st.query_params.get("admin", "") == "pathpilot2026"
+
+if admin_mode:
+    admin_panel()
+    st.markdown("---")
 
 st.header("👤 Tell us about yourself")
 name = st.text_input("What's your name?")
@@ -67,15 +99,31 @@ route = st.radio("Which route are you interested in?",
                  ["Degree Apprenticeship", "University", "Either"])
 
 # ------------------------------
-# SUBMIT & RESULTS
+# SUBMIT & SAVE
 # ------------------------------
 if st.button("🚀 Get My Recommendations!", type="primary"):
     if not name:
         st.error("Please enter your name!")
     else:
+        # Save this user's response
+        user_data = {
+            "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "Name": name,
+            "Subjects": ", ".join(subjects) if subjects else "Not entered",
+            "Skills": ", ".join(skills) if skills else "Not entered",
+            "Interests": ", ".join(interests) if interests else "Not entered",
+            "Preferred Route": route
+        }
+        
+        # Add to all responses
+        st.session_state.all_responses.append(user_data)
+        
+        st.success("✅ Thank you! Your response has been recorded!")
+        
         st.markdown("---")
         st.header(f"📊 Hi {name} — Your Recommendations")
         
+        # Calculate matches
         matches = []
         user_subjects = set(s.lower() for s in subjects)
         user_skills = set(s.lower() for s in skills)
@@ -112,3 +160,10 @@ if st.button("🚀 Get My Recommendations!", type="primary"):
         
         st.markdown("---")
         st.success(f"Thank you for using PathPilot, {name}! 🎉")
+
+# ------------------------------
+# YOUR SECRET LINK — ONLY YOU KNOW THIS!
+# ------------------------------
+if not admin_mode:
+    st.markdown("---")
+    st.caption(f"💡 **Your admin link:** {st.query_params.get('_', '')}?admin=pathpilot2026")
