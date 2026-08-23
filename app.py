@@ -545,8 +545,12 @@ if st.button("🚀 Find My Perfect Career!", type="primary"):
         st.subheader("📬 Help us improve — submit your results!")
         st.info("Click below to send your answers — it takes 10 seconds!")
         
+                # === SUBMIT BUTTON ===
+        st.markdown("---")
+        st.subheader("📬 Help us improve — submit your results!")
+        st.info("Click below to send your answers — it takes 10 seconds!")
+        
         if GOOGLE_FORM_LINK != "PASTE_YOUR_GOOGLE_FORM_LINK_HERE":
- ":
             st.markdown(f'<a href="{GOOGLE_FORM_LINK}" target="_blank"><button style="background-color:#4CAF50;color:white;padding:12px 24px;border:none;border-radius:8px;font-size:18px;cursor:pointer;width:100%;">📋 Submit My Results</button></a>', unsafe_allow_html=True)
         else:
             st.warning("⚠️ Please add your Google Form link in the code!")
