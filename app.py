@@ -14,10 +14,10 @@ st.set_page_config(
 )
 
 # ============================================================
-# 🛡️ FORCE-INITIALISE EVERYTHING — NO MORE CRASH! ✅
+# 🛡️ SESSION STATE
 # ============================================================
 if "results" not in st.session_state:
-    st.session_state.results = []  # ← EMPTY LIST, NOT NONE
+    st.session_state.results = []
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
 if "path_preference" not in st.session_state:
@@ -41,33 +41,79 @@ if not st.session_state.all_submissions:
     st.session_state.all_submissions = load_submissions()
 
 # ============================================================
-# STYLING
+# 🎨 SMART STYLING — AUTO SWAPS FOR LIGHT/DARK MODE! ✅
 # ============================================================
 st.markdown("""
     <style>
     .main { padding-top: 1.5rem; }
     .hero {
         padding: 2.5rem; border-radius: 24px; margin-bottom: 2rem;
-        background: linear-gradient(135deg, #5B21B6 0%, #7C3AED 100%); color: white;
+        background: linear-gradient(135deg, #5B21B6 0%, #7C3AED 100%); 
+        color: white !important;
     }
+    .hero * { color: white !important; }
+
+    /* ========== SMART CAREER CARD — AUTO ADAPTS! ========== */
+    /* Dark Mode: White card + BLACK text */
+    @media (prefers-color-scheme: dark) {
+        .career-card {
+            background: #FFFFFF !important;
+            color: #000000 !important;
+            border: 1px solid #e5e7eb;
+        }
+        .career-card * { color: #000000 !important; }
+        .match-score { color: #5B21B6 !important; }
+    }
+    /* Light Mode: Dark card + WHITE text */
+    @media (prefers-color-scheme: light) {
+        .career-card {
+            background: #1F2937 !important;
+            color: #FFFFFF !important;
+            border: 1px solid #374151;
+        }
+        .career-card * { color: #FFFFFF !important; }
+        .match-score { color: #A78BFA !important; }
+    }
+    
     .career-card {
-        padding: 1.5rem; border-radius: 18px; border: 1px solid #e5e7eb;
-        margin-bottom: 1.5rem; background: white;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+        padding: 1.5rem; border-radius: 18px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.1);
     }
     .match-score { font-size: 2rem; font-weight: 700; }
+
+    /* ========== OPTION BOXES — ALSO AUTO ADAPT! ========== */
+    @media (prefers-color-scheme: dark) {
+        .uni-option { background: #F0F4FF; color: #1F2937 !important; border-left-color: #7C3AED; }
+        .uni-option * { color: #1F2937 !important; }
+        .app-option { background: #FFF7ED; color: #1F2937 !important; border-left-color: #F97316; }
+        .app-option * { color: #1F2937 !important; }
+        .reason-box { background: #F0FFF4; color: #1F2937 !important; border-left-color: #22C55E; }
+        .reason-box * { color: #1F2937 !important; }
+    }
+    @media (prefers-color-scheme: light) {
+        .uni-option { background: #1E293B; color: #E0E7FF !important; border-left-color: #818CF8; }
+        .uni-option * { color: #E0E7FF !important; }
+        .app-option { background: #292524; color: #FED7AA !important; border-left-color: #FB923C; }
+        .app-option * { color: #FED7AA !important; }
+        .reason-box { background: #1A2E1F; color: #BBF7D0 !important; border-left-color: #4ADE80; }
+        .reason-box * { color: #BBF7D0 !important; }
+    }
+    
     .uni-option {
-        background: #F0F4FF; padding: 1.25rem; border-radius: 14px; margin: 0.75rem 0;
-        border-left: 5px solid #7C3AED;
+        padding: 1.25rem; border-radius: 14px; margin: 0.75rem 0;
+        border-left: 5px solid;
     }
     .app-option {
-        background: #FFF7ED; padding: 1.25rem; border-radius: 14px; margin: 0.75rem 0;
-        border-left: 5px solid #F97316;
+        padding: 1.25rem; border-radius: 14px; margin: 0.75rem 0;
+        border-left: 5px solid;
     }
     .reason-box {
-        background: #F0FFF4; padding: 1rem; border-radius: 12px; margin: 0.5rem 0;
-        border-left: 4px solid #22C55E;
+        padding: 1rem; border-radius: 12px; margin: 0.5rem 0;
+        border-left: 4px solid;
     }
+
+    /* Level tags */
     .level-tag {
         display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px;
         font-size: 0.85rem; font-weight: 600; margin-right: 0.5rem; margin-bottom: 0.25rem;
@@ -204,9 +250,84 @@ industries = st.multiselect("Select industries 🎯:", [
 ])
 
 # ============================================================
-# 5️⃣ WORK ENVIRONMENT
+# 5️⃣ 💼 WHAT MATTERS MOST — ORGANISED TICK BOXES! ✅
 # ============================================================
-st.subheader("5️⃣ What work style fits you best?")
+st.subheader("5️⃣ 💼 What matters MOST to you in a job?")
+st.caption("💛 Tick EVERYTHING that's important to YOU — this helps us find roles that actually fit YOUR priorities!")
+
+st.markdown("**💰 Pay & Rewards**")
+v_pay = st.multiselect("Pay & Rewards:", [
+    "💰 High salary / Top earning potential",
+    "📈 Regular pay rises & bonuses",
+    "🏖️ Great holiday / vacation allowance",
+    "🏥 Health benefits & private healthcare",
+    "🔒 Pension & retirement contributions",
+    "🎁 Perks — discounts, gym, travel, etc.",
+    "🚗 Company car or car allowance"
+])
+
+st.markdown("**🤝 People & Culture**")
+v_culture = st.multiselect("People & Culture:", [
+    "🤝 Friendly, supportive team environment",
+    "🙌 Helpful & supportive managers",
+    "🎉 Fun, social & relaxed atmosphere",
+    "🤝 Diverse & inclusive workplace",
+    "🏆 Recognition for hard work & achievements",
+    "🗣️ Open communication — everyone has a voice",
+    "🧘‍♀️ Kind, understanding & empathetic culture"
+])
+
+st.markdown("**📈 Growth & Future**")
+v_growth = st.multiselect("Growth & Future:", [
+    "📈 Clear promotion & career progression paths",
+    "📚 Constant learning & training opportunities",
+    "🎓 Funding for further qualifications / degrees",
+    "🚀 Fast-paced — lots of opportunities early on",
+    "🔒 Job security & stability — long-term career",
+    "🌟 Clear future outlook — growing industry"
+])
+
+st.markdown("**⚖️ Lifestyle & Flexibility**")
+v_lifestyle = st.multiselect("Lifestyle & Flexibility:", [
+    "🏠 Remote working / Work from home",
+    "🏢 Hybrid — mix of office & home",
+    "⏰ Flexible hours / Flexible start/finish times",
+    "⚖️ Great work-life balance — no unpaid overtime",
+    "🌴 Generous annual leave & holidays",
+    "🕒 Predictable hours — regular schedule",
+    "🌙 No weekends / evenings — standard hours only",
+    "🏃‍♂️ Short commute / Work close to home"
+])
+
+st.markdown("**🎨 Impact & Purpose**")
+v_purpose = st.multiselect("Impact & Purpose:", [
+    "🌍 Making a positive difference to society",
+    "♻️ Working on sustainability / helping the planet",
+    "❤️ Helping people & improving lives",
+    "⚡ Working on exciting, innovative projects",
+    "🎨 Creative freedom — express your ideas",
+    "📢 Making an impact — your work matters",
+    "🏛️ Working for a cause / mission you believe in"
+])
+
+st.markdown("**🏢 Environment & Style**")
+v_env = st.multiselect("Environment & Style:", [
+    "🏢 Modern, nice office / great facilities",
+    "🔬 Labs, studios, or specialist spaces",
+    "⚡ Fast-paced & always changing",
+    "📚 Calm, steady & low-pressure",
+    "🤝 Lots of teamwork — collaborative",
+    "🧑‍💻 Independent work — focus on your own",
+    "🏗️ Hands-on / Practical work",
+    "💡 Problem-solving & intellectual challenge"
+])
+
+work_values = v_pay + v_culture + v_growth + v_lifestyle + v_purpose + v_env
+
+# ============================================================
+# 6️⃣ WORK ENVIRONMENT
+# ============================================================
+st.subheader("6️⃣ What work style fits you best?")
 environment = st.multiselect("Select all:", [
     "🏢 Professional office", "🏠 Remote / Hybrid", "🔬 Lab / Courtroom / Studio",
     "🤝 Meeting people & client-facing", "🧑‍💻 Independent work & focus",
@@ -220,19 +341,27 @@ environment = st.multiselect("Select all:", [
 # ============================================================
 CAREERS = [
     {
-        "industry": "🎬 CREATIVE & MEDIA — Content Creator, Social Media, UX, Design, Film, Journalism",
-        "name": "Content Creator / Digital Creator",
-        "desc": "Build an audience, create video, social media, podcasts — shape culture & build brands online",
-        "required_subjects": ["Media / Film / Journalism", "Art & Design", "English Language", "Digital Media", "Marketing"],
-        "required_interests": ["🎬 Content creation, video & media", "📱 Social media & digital trends", "🎨 Design, creativity & visual arts"],
-        "key_skills": ["creativity", "video editing", "storytelling", "social media", "communication", "self-management", "problem-solving"],
-        "uni_undergrad": ["Digital Media & Production", "Media & Communications", "Journalism", "Film Production", "Digital Marketing"],
-        "uni_postgrad": ["MA Digital Media", "MA Creative Media Practice", "MA Social Media & Communications"],
-        "uni_route": "A Levels → Media/Creative Degree (3 yrs) → Build Portfolio → Freelance/Agency/Own Channel",
-        "app_levels": ["Level 3 (Creative Media)", "Level 4 (Digital Marketer)", "Level 6 (Digital Media Degree Apprenticeship)"],
-        "app_route": "A Levels → Digital Media/Content Creator Apprenticeship → Build Portfolio → Full-Time/Own Business — PAID • NO FEES",
-        "app_extra": "Level 6 = full degree equivalent — earn while you build your brand!",
-        "skills_build": ["Video Editing", "Social Media Strategy", "Copywriting", "Content Planning", "Visual Design"]
+        "industry": "💰 FINANCE — Banking, Investment, Accounting, Financial Analyst, Tax",
+        "name": "Chartered Accountant",
+        "desc": "Manage finances, audit accounts, advise on tax — essential to every organisation",
+        "required_subjects": ["Maths", "Accounting / Finance", "Business Studies", "Economics"],
+        "required_interests": ["💰 Finance, business & economics"],
+        "key_skills": ["attention to detail", "numeracy", "organisation", "integrity", "problem-solving", "analysis"],
+        "work_values_fit": [
+            "💰 High salary / Top earning potential",
+            "📈 Regular pay rises & bonuses",
+            "📈 Clear promotion & career progression paths",
+            "🔒 Job security & stability — long-term career",
+            "🏥 Health benefits & private healthcare",
+            "🔒 Pension & retirement contributions"
+        ],
+        "uni_undergrad": ["Accounting & Finance", "Business & Accounting", "Economics"],
+        "uni_postgrad": ["ACA", "ACCA", "CIMA"],
+        "uni_route": "A Levels → Degree → ACA/ACCA Training → Qualified Chartered Accountant",
+        "app_levels": ["Level 4 (Accounting Technician)", "Level 6 (Degree Apprenticeship)", "Level 7 (ACA/ACCA Integrated)"],
+        "app_route": "A Levels → Accountancy Degree Apprenticeship → Qualified — PAID • NO FEES • DEBT-FREE",
+        "app_extra": "Level 7 apprenticeships include ACA/ACCA exams — qualify fully while earning!",
+        "skills_build": ["Excel", "Financial Reporting", "Tax Knowledge", "Audit Procedures"]
     },
     {
         "industry": "💻 TECHNOLOGY — Software Dev, Data Science, Cybersecurity, AI, Web Dev",
@@ -241,6 +370,15 @@ CAREERS = [
         "required_subjects": ["Computer Science", "Maths", "Further Maths", "Physics"],
         "required_interests": ["💻 Coding & software development", "🤖 AI & technology"],
         "key_skills": ["coding", "python", "problem-solving", "logic", "debugging", "teamwork"],
+        "work_values_fit": [
+            "💰 High salary / Top earning potential",
+            "🏠 Remote working / Work from home",
+            "🏢 Hybrid — mix of office & home",
+            "📚 Constant learning & training opportunities",
+            "🎓 Funding for further qualifications / degrees",
+            "⚡ Working on exciting, innovative projects",
+            "🚀 Fast-paced — lots of opportunities early on"
+        ],
         "uni_undergrad": ["Computer Science", "Software Engineering", "Computer Science with AI"],
         "uni_postgrad": ["MSc Advanced Computer Science", "MSc Software Engineering"],
         "uni_route": "A Levels → Computer Science Degree → Graduate Scheme → Junior Dev",
@@ -256,6 +394,14 @@ CAREERS = [
         "required_subjects": ["Law", "Politics / International Relations", "History", "English Language", "Philosophy & Ethics"],
         "required_interests": ["⚖️ Law, justice & debating", "📖 Reading, writing & research", "📈 Politics, policy & current affairs"],
         "key_skills": ["legal research", "written communication", "attention to detail", "client care", "negotiation", "problem-solving"],
+        "work_values_fit": [
+            "💰 High salary / Top earning potential",
+            "📈 Clear promotion & career progression paths",
+            "🔒 Job security & stability — long-term career",
+            "🏛️ Working for a cause / mission you believe in",
+            "🗣️ Open communication — everyone has a voice",
+            "📢 Making an impact — your work matters"
+        ],
         "uni_undergrad": ["Law (LLB)", "Law with Politics", "Law with Business", "Law with International Relations"],
         "uni_postgrad": ["LPC — Legal Practice Course", "LLM Master of Laws", "MSc Law & Governance"],
         "uni_route": "A Levels → Law Degree (3 yrs) → LPC (1 yr) → Training Contract (2 yrs) → Qualified Solicitor",
@@ -271,6 +417,14 @@ CAREERS = [
         "required_subjects": ["Biology", "Health & Social Care", "Psychology"],
         "required_interests": ["🏥 Helping people & healthcare"],
         "key_skills": ["compassion", "communication", "patience", "teamwork", "problem-solving", "resilience"],
+        "work_values_fit": [
+            "❤️ Helping people & improving lives",
+            "🤝 Friendly, supportive team environment",
+            "🙌 Helpful & supportive managers",
+            "🔒 Job security & stability — long-term career",
+            "🤝 Diverse & inclusive workplace",
+            "🎉 Fun, social & relaxed atmosphere"
+        ],
         "uni_undergrad": ["Nursing (Adult/Child/Mental Health)", "Nursing with Foundation Year"],
         "uni_postgrad": ["MSc Advanced Nursing", "Specialist Practitioner Courses"],
         "uni_route": "A Levels → Nursing Degree → NMC Registration → Band 5 Nurse",
@@ -280,19 +434,27 @@ CAREERS = [
         "skills_build": ["Empathy", "Patient Care", "Communication", "Clinical Skills", "Time Management"]
     },
     {
-        "industry": "💰 FINANCE — Banking, Investment, Accounting, Financial Analyst, Tax",
-        "name": "Chartered Accountant",
-        "desc": "Manage finances, audit accounts, advise on tax — essential to every organisation",
-        "required_subjects": ["Maths", "Accounting / Finance", "Business Studies", "Economics"],
-        "required_interests": ["💰 Finance, business & economics"],
-        "key_skills": ["attention to detail", "numeracy", "organisation", "integrity", "problem-solving", "analysis"],
-        "uni_undergrad": ["Accounting & Finance", "Business & Accounting", "Economics"],
-        "uni_postgrad": ["ACA", "ACCA", "CIMA"],
-        "uni_route": "A Levels → Degree → ACA/ACCA Training → Qualified Chartered Accountant",
-        "app_levels": ["Level 4 (Accounting Technician)", "Level 6 (Degree Apprenticeship)", "Level 7 (ACA/ACCA Integrated)"],
-        "app_route": "A Levels → Accountancy Degree Apprenticeship → Qualified — PAID • NO FEES • DEBT-FREE",
-        "app_extra": "Level 7 apprenticeships include ACA/ACCA exams — qualify fully while earning!",
-        "skills_build": ["Excel", "Financial Reporting", "Tax Knowledge", "Audit Procedures"]
+        "industry": "🎬 CREATIVE & MEDIA — Content Creator, Social Media, UX, Design, Film, Journalism",
+        "name": "Content Creator / Digital Creator",
+        "desc": "Build an audience, create video, social media, podcasts — shape culture & build brands online",
+        "required_subjects": ["Media / Film / Journalism", "Art & Design", "English Language", "Digital Media", "Marketing"],
+        "required_interests": ["🎬 Content creation, video & media", "📱 Social media & digital trends", "🎨 Design, creativity & visual arts"],
+        "key_skills": ["creativity", "video editing", "storytelling", "social media", "communication", "self-management", "problem-solving"],
+        "work_values_fit": [
+            "🎨 Creative freedom — express your ideas",
+            "🏠 Remote working / Work from home",
+            "⏰ Flexible hours / Flexible start/finish times",
+            "🚀 Fast-paced — lots of opportunities early on",
+            "⚡ Working on exciting, innovative projects",
+            "📢 Making an impact — your work matters"
+        ],
+        "uni_undergrad": ["Digital Media & Production", "Media & Communications", "Journalism", "Film Production", "Digital Marketing"],
+        "uni_postgrad": ["MA Digital Media", "MA Creative Media Practice", "MA Social Media & Communications"],
+        "uni_route": "A Levels → Media/Creative Degree (3 yrs) → Build Portfolio → Freelance/Agency/Own Channel",
+        "app_levels": ["Level 3 (Creative Media)", "Level 4 (Digital Marketer)", "Level 6 (Digital Media Degree Apprenticeship)"],
+        "app_route": "A Levels → Digital Media/Content Creator Apprenticeship → Build Portfolio → Full-Time/Own Business — PAID • NO FEES",
+        "app_extra": "Level 6 = full degree equivalent — earn while you build your brand!",
+        "skills_build": ["Video Editing", "Social Media Strategy", "Copywriting", "Content Planning", "Visual Design"]
     },
     {
         "industry": "🏗️ ENGINEERING — Civil, Mechanical, Electrical, Aerospace, Structural",
@@ -301,6 +463,14 @@ CAREERS = [
         "required_subjects": ["Maths", "Further Maths", "Physics"],
         "required_interests": ["🏗️ Building, engineering & design", "🌍 Environment & sustainability"],
         "key_skills": ["design", "problem-solving", "maths", "project management", "teamwork"],
+        "work_values_fit": [
+            "💰 High salary / Top earning potential",
+            "🌍 Making a positive difference to society",
+            "📈 Clear promotion & career progression paths",
+            "⚡ Working on exciting, innovative projects",
+            "🔒 Job security & stability — long-term career",
+            "🏢 Modern, nice office / great facilities"
+        ],
         "uni_undergrad": ["Civil Engineering", "Civil & Structural Engineering"],
         "uni_postgrad": ["MSc Civil Engineering", "MSc Sustainable Infrastructure"],
         "uni_route": "A Levels → Civil Engineering Degree → ICE Graduate Scheme → Chartered Engineer",
@@ -323,6 +493,7 @@ def calculate_match(career):
             return 0, ["❌ Not in your selected industry"]
     
     skill_text = skills.lower()
+    
     transferable_skills = {
         "problem-solving": 5, "problem solving": 5, "communication": 5, "people skills": 5,
         "research": 5, "writing": 5, "creativity": 5, "teamwork": 4, "analysis": 5
@@ -347,6 +518,13 @@ def calculate_match(career):
         score += min(len(interest_match) * 6, 20)
         reasons.append(f"✅ Interests match: {', '.join(list(interest_match)[:3])}")
     
+    if work_values and career.get("work_values_fit"):
+        values_match = set(work_values).intersection(set(career["work_values_fit"]))
+        if values_match:
+            score += min(len(values_match) * 4, 15)
+            top_values = list(values_match)[:3]
+            reasons.append(f"💼 YOUR priorities: {', '.join(top_values)} — PERFECT fit!")
+    
     return min(score, 100), reasons
 
 # ============================================================
@@ -367,9 +545,9 @@ if st.button("🔍 Find My Personalised Matches", type="primary", use_container_
         st.rerun()
 
 # ============================================================
-# 📊 SHOW RESULTS — ✅ FIXED LINE 518 AREA!
+# 📊 SHOW RESULTS — AUTO LIGHT/DARK MODE! ✅
 # ============================================================
-if len(st.session_state.results) > 0:  # ← THIS IS THE FIXED LINE!
+if len(st.session_state.results) > 0:
     st.markdown("---")
     st.header("✨ Your Personalised PathPilot Results")
     st.subheader(f"Based on: **{st.session_state.path_preference}**")
