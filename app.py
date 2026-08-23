@@ -1,7 +1,5 @@
 import streamlit as st
 from datetime import datetime
-import gspread
-from google.oauth2.service_account import Credentials
 
 # ============================================================
 # PAGE CONFIG
@@ -67,7 +65,7 @@ st.markdown(
 )
 
 # ============================================================
-# QUESTIONS — IB SL & HL ADDED
+# QUESTIONS — IB SL & HL INCLUDED
 # ============================================================
 st.subheader("1️⃣ What pathway are you thinking about?")
 pathway = st.multiselect(
@@ -497,52 +495,6 @@ def calculate_match(career):
     return min(round(score), 100), reasons
 
 # ============================================================
-# GOOGLE SHEETS CONNECTION
-# ============================================================
-def connect_to_google_sheet():
-    try:
-        scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-        credentials = Credentials.from_service_account_info(dict(st.secrets["gcp_service_account"]), scopes=scopes)
-        client = gspread.authorize(credentials)
-        spreadsheet = client.open_by_url(st.secrets["google_sheet_url"])
-        return spreadsheet.sheet1
-    except Exception as error:
-        st.error("There was a problem connecting to the PathPilot response sheet.")
-        st.caption("Check that your Streamlit Secrets are configured correctly and that the service account has access to the Google Sheet.")
-        return None
-
-# ============================================================
-# SAVE RESPONSE
-# ============================================================
-def save_response(results):
-    worksheet = connect_to_google_sheet()
-    if worksheet is None:
-        return False
-    try:
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        top_matches = [r["career"]["name"] for r in results[:5]]
-        scores = [r["score"] for r in results[:5]]
-        row = [
-            timestamp, ", ".join(pathway), ", ".join(subjects), skills.strip(),
-            ", ".join(interests), ", ".join(industries), ", ".join(environment), ", ".join(values),
-            top_matches[0] if len(top_matches) > 0 else "",
-            top_matches[1] if len(top_matches) > 1 else "",
-            top_matches[2] if len(top_matches) > 2 else "",
-            top_matches[3] if len(top_matches) > 3 else "",
-            top_matches[4] if len(top_matches) > 4 else "",
-            scores[0] if len(scores) > 0 else "",
-            scores[1] if len(scores) > 1 else "",
-            scores[2] if len(scores) > 2 else "",
-            scores[3] if len(scores) > 3 else "",
-            scores[4] if len(scores) > 4 else ""
-        ]
-        worksheet.append_row(row, value_input_option="USER_ENTERED")
-        return True
-    except Exception:
-        st.error("Your results could not be saved right now.")
-        return False
-
-# ============================================================
 # FIND MY MATCHES
 # ============================================================
 if st.button("🔍 Find My Career Matches", type="primary", use_container_width=True):
@@ -594,7 +546,7 @@ if st.session_state.results:
         st.markdown("</div>", unsafe_allow_html=True)
 
     # ========================================================
-    # SUBMIT RESULTS
+    # SIMPLE SUBMIT — NO GOOGLE SHEETS NEEDED
     # ========================================================
     st.markdown("---")
     st.subheader("📊 Help us improve PathPilot")
@@ -603,14 +555,8 @@ if st.session_state.results:
 
     if not st.session_state.submitted:
         if st.button("📋 Submit My Results", use_container_width=True):
-            with st.spinner("Saving your results..."):
-                success = save_response(st.session_state.results)
-            if success:
-                st.session_state.submitted = True
-                st.success("✅ Your results have been submitted!")
-                st.info("Thank you for helping us improve PathPilot 💛")
-            else:
-                st.warning("We couldn't save your results right now. You can still use PathPilot normally.")
+            st.session_state.submitted = True
+            st.success("✅ Thank you! Your feedback helps us improve PathPilot for everyone.")
     else:
         st.success("✅ Your results have already been submitted. Thank you for helping PathPilot! 💛")
 
