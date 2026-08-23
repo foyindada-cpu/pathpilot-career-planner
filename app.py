@@ -18,6 +18,8 @@ if "results" not in st.session_state:
     st.session_state.results = None
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
+if "all_responses" not in st.session_state:
+    st.session_state.all_responses = []
 
 # ============================================================
 # STYLING
@@ -45,374 +47,398 @@ st.markdown(
     }
     .match-score { font-size: 2rem; font-weight: 700; }
     .small-text { color: #6b7280; }
+    .response-box {
+        background: #f9fafb;
+        padding: 1rem;
+        border-radius: 12px;
+        margin: 0.5rem 0;
+        border-left: 4px solid #667eea;
+    }
+    .section-heading {
+        background: #f0f4ff;
+        padding: 1rem;
+        border-radius: 12px;
+        border-left: 4px solid #667eea;
+        margin: 1.5rem 0 1rem 0;
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
 
 # ============================================================
-# HERO
+# HERO — FOR EVERYONE, AT ANY STAGE! 🎒🎓
 # ============================================================
 st.markdown(
     """
     <div class="hero">
         <h1>🚀 PathPilot</h1>
-        <p>Discover pathways and careers that fit YOU.</p>
-        <p>Explore your options based on your subjects, skills, interests and goals.</p>
+        <p><strong>For GCSE • A Level • IB • Apprenticeships • University • Degree Apprenticeships • Career Changers</strong></p>
+        <p>No matter where you are in life — if you're figuring out your next move, this is for YOU.</p>
     </div>
     """,
     unsafe_allow_html=True
 )
 
 # ============================================================
-# QUESTIONS — IB SL & HL INCLUDED
+# QUESTIONS — EVERY STAGE COVERED ✅
 # ============================================================
-st.subheader("1️⃣ What pathway are you thinking about?")
+st.markdown('<div class="section-heading"><h3>👤 Where are you at right now?</h3></div>', unsafe_allow_html=True)
+
+st.subheader("1️⃣ What stage & pathway are you on?")
 pathway = st.multiselect(
-    "Select all that apply:",
+    "Select ALL that apply — no matter where you are:",
     [
-        "A Levels",
-        "International Baccalaureate — Standard Level (IB SL)",
-        "International Baccalaureate — Higher Level (IB HL)",
-        "T Level",
-        "BTEC (Level 3 / Extended Diploma)",
-        "CTEC",
-        "OCR Cambridge Technical",
-        "Intermediate Apprenticeship (Level 2)",
-        "Advanced Apprenticeship (Level 3)",
-        "Higher Apprenticeship (Level 4)",
-        "Higher Apprenticeship (Level 5)",
-        "Degree Apprenticeship (Level 6)",
-        "Degree Apprenticeship (Level 7)",
-        "University",
-        "School Leaver Programme",
-        "Access to HE",
-        "Not sure yet"
+        "🏫 GCSE / Year 9–11 — deciding next steps",
+        "📚 A Levels",
+        "📘 IB — Standard Level (SL)",
+        "📕 IB — Higher Level (HL)",
+        "🔧 T Level",
+        "📖 BTEC / CTEC / Cambridge Technical",
+        "🛠️ Apprenticeship — Level 2 / Intermediate",
+        "🛠️ Apprenticeship — Level 3 / Advanced",
+        "🛠️ Apprenticeship — Level 4/5 / Higher",
+        "🎓 Degree Apprenticeship — Level 6",
+        "🎓 Degree Apprenticeship — Level 7",
+        "🏛️ University — Undergraduate",
+        "🏛️ University — Postgraduate / Master's",
+        "🔄 Graduate / Finished Uni — exploring options",
+        "💼 Working — looking for a career change",
+        "❓ Not sure yet — still figuring it all out!"
     ]
 )
 
-st.subheader("2️⃣ What subjects are you studying right now?")
+st.subheader("2️⃣ What subjects or qualifications are you studying / have you done?")
+st.caption("GCSE, A Level, IB, Degree, College — everything counts!")
 subjects = st.multiselect(
     "Tick all that apply:",
     [
         "Maths", "Further Maths", "English Language", "English Literature",
-        "Biology", "Chemistry", "Physics", "Computer Science",
-        "IT / Digital Technology", "Economics", "Business Studies",
-        "Psychology", "Sociology", "History", "Geography",
-        "French / Spanish / Other Language", "Art & Design", "Graphic Design",
-        "Engineering", "Health & Social Care", "Law", "Media Studies",
-        "PE / Sports Science", "Music / Music Technology", "Drama / Theatre",
-        "Philosophy & Ethics", "Other"
+        "Combined Science (GCSE)", "Biology", "Chemistry", "Physics",
+        "Computer Science", "IT / Digital Technology", "Data Science",
+        "Geography", "History", "Politics", "Citizenship / PSHE",
+        "French", "Spanish", "German", "Other Language",
+        "Art & Design", "Graphic Design", "Photography", "Textiles", "Fine Art",
+        "Music", "Music Technology", "Drama / Theatre", "Dance", "Film / Media",
+        "Business Studies", "Economics", "Accounting", "Finance", "Enterprise",
+        "Health & Social Care", "Child Development", "Psychology", "Sociology",
+        "Food Preparation & Nutrition", "Hospitality & Catering", "Travel & Tourism",
+        "Design & Technology", "Engineering", "Electronics", "Construction",
+        "PE / Sports Science", "Sports Management", "Nutrition",
+        "Law", "Philosophy & Ethics", "Religious Studies",
+        "Creative Writing", "Journalism", "Marketing", "Digital Media",
+        "Education / Teaching", "Social Work", "Criminology",
+        "Other — not listed"
     ]
 )
 
-st.subheader("3️⃣ What are your best skills?")
+st.subheader("3️⃣ What are your BEST skills?")
 st.caption(
-    "Tell us what you're good at. For example: "
-    "coding, problem-solving, leadership, teamwork, "
-    "public speaking, creativity, organisation, "
-    "writing, research, data analysis or planning."
+    "Everything you're good at — school, work, life, hobbies! "
+    "Examples: problem-solving, teamwork, leadership, coding, communication, "
+    "organisation, creativity, research, data analysis, public speaking, writing..."
 )
-skills = st.text_area("Your skills:", placeholder="e.g. coding, problem-solving, teamwork...")
+skills = st.text_area("Your skills — be proud, list them! 💪:", 
+                      placeholder="e.g. good at problem solving, work well in teams, know some Python, great at communicating, organised, creative, good with numbers...")
 
-st.subheader("4️⃣ What do you enjoy doing most?")
+st.subheader("4️⃣ What do you ENJOY doing?")
+st.caption("Hobbies, passions, things you lose track of time doing — ALL of it matters!")
 interests = st.multiselect(
-    "Pick all that match:",
+    "Pick ALL that match:",
     [
-        "Coding, programming & software development",
-        "Art, design, drawing & creative work",
-        "Sports, fitness, training & outdoor activities",
-        "Gaming, esports & streaming",
-        "Writing, journalism, blogging & content creation",
-        "Science experiments, research & discovering new things",
-        "Business ideas, entrepreneurship & starting projects",
-        "Helping people, mentoring, charity & community work",
-        "Teaching, explaining, tutoring & supporting others",
-        "Building, making, fixing & hands-on creating",
-        "Travelling, exploring & learning about different cultures",
-        "Music, performing, singing, instruments & entertainment",
-        "Social media, content creation, marketing & trends",
-        "Working with numbers, data, maths & analysing facts",
-        "Nature, animals, wildlife & the environment",
-        "Debating, politics, current affairs & discussing ideas",
-        "Cooking, baking, food & hospitality",
-        "Fashion, beauty, styling & lifestyle",
-        "Photography, videography & visual storytelling",
-        "Planning events, organising & bringing people together",
-        "Languages, learning about other countries & translating",
-        "Reading, learning & discovering new things",
-        "Not sure yet"
+        "💻 Coding, programming, tech & software development",
+        "🎨 Art, design, creativity & making things look good",
+        "⚽ Sports, fitness, keeping active & outdoor adventures",
+        "🎮 Gaming, esports, streaming & digital content",
+        "✍️ Writing, storytelling, blogging & journalism",
+        "🔬 Science — experiments, research & discovering how things work",
+        "💡 Business ideas, entrepreneurship & starting projects",
+        "🤝 Helping people, mentoring, charity & making a difference",
+        "👩‍🏫 Teaching, explaining & helping others learn",
+        "🔨 Building, making, fixing & hands-on creating",
+        "✈️ Travel, cultures, languages & exploring the world",
+        "🎵 Music, performing, singing & entertainment",
+        "📱 Social media, content creation, marketing & trends",
+        "📊 Numbers, data, maths & analysing information",
+        "🌿 Nature, animals, wildlife & the environment",
+        "🗣️ Debating, politics, current affairs & discussing ideas",
+        "🍳 Cooking, baking, food & hospitality",
+        "👗 Fashion, styling & design",
+        "📸 Photography, videography & visual storytelling",
+        "📋 Planning, organising & bringing people together",
+        "📚 Reading, researching & learning new things",
+        "❓ Not sure yet — still exploring!"
     ]
 )
 
-st.subheader("5️⃣ Which industries interest you most?")
+st.subheader("5️⃣ Which industries or fields interest you MOST?")
 industries = st.multiselect(
-    "Pick as many as you like:",
+    "Pick as many as you like — dream big! ✨:",
     [
-        "Technology, Software Development & IT",
-        "Engineering — Mechanical, Electrical, Civil & Aerospace",
-        "Healthcare, Medicine, Nursing & Mental Health",
-        "Business, Finance, Accounting & Banking",
-        "Creative, Media, Design, Film & Journalism",
-        "Education, Teaching & Training",
-        "Law, Legal Services, Politics & Government",
-        "Science, Research, Biotech & Pharmaceuticals",
-        "Sports, Fitness, Leisure & Nutrition",
-        "Public Services, Police, Fire, Military & Civil Service",
-        "Environment, Sustainability, Green Energy & Conservation",
-        "Hospitality, Events, Tourism & Travel",
-        "Marketing, Advertising, PR & Communications",
-        "Construction, Architecture, Surveying & Property",
-        "Transport, Logistics, Aviation & Supply Chain",
-        "Fashion, Retail, Merchandising & Consumer Brands",
-        "Digital Media, Gaming, Animation & VFX",
-        "Charity, Non-Profit & Social Impact",
-        "Manufacturing, Production & Industrial Design",
-        "Human Resources, Recruitment & People Management",
-        "Publishing, Literature & Libraries",
-        "Performing Arts, Music Production & Entertainment",
-        "Agriculture, Food Science & Veterinary",
-        "Energy, Oil & Gas / Renewables",
-        "Law Enforcement, Security & Intelligence",
-        "Not sure yet"
+        "💻 Technology, Software Development, IT & Digital",
+        "🏗️ Engineering — Mechanical, Electrical, Civil, Aerospace",
+        "🏥 Healthcare, Medicine, Nursing & Mental Health",
+        "💰 Business, Finance, Accounting, Banking & Economics",
+        "🎬 Creative, Media, Design, Film, Gaming & Journalism",
+        "📚 Education, Teaching & Training",
+        "⚖️ Law, Legal Services, Politics & Government",
+        "🔬 Science, Research, Biotech & Pharmaceuticals",
+        "🏃 Sports, Fitness, Leisure & Nutrition",
+        "🚔 Public Services — Police, Fire, Ambulance, Military",
+        "🌱 Environment, Sustainability, Green Energy & Conservation",
+        "🏨 Hospitality, Events, Tourism & Travel",
+        "📣 Marketing, Advertising, PR & Communications",
+        "🏢 Construction, Architecture, Surveying & Property",
+        "✈️ Transport, Logistics, Aviation & Supply Chain",
+        "🛍️ Retail, Fashion, Merchandising & Customer Service",
+        "📱 Digital Media, Gaming, Animation & VFX",
+        "❤️ Charity, Non-Profit & Social Impact",
+        "🏭 Manufacturing, Production & Industrial Design",
+        "👥 Human Resources, Recruitment & People Management",
+        "🎭 Performing Arts, Music Production & Entertainment",
+        "🐾 Agriculture, Food Science & Veterinary",
+        "⚡ Energy, Renewables & Utilities",
+        "❓ Not sure yet — still exploring!"
     ]
 )
 
-st.subheader("6️⃣ What kind of work environment do you prefer?")
+st.subheader("6️⃣ What kind of work environment do you thrive in?")
 environment = st.multiselect(
-    "Select all that fit:",
+    "Select ALL that fit you — there's no right or wrong!:",
     [
-        "Professional office setting", "Fast-paced & busy",
-        "Creative / relaxed vibe", "Working outdoors / on-site",
-        "Lab / research facility", "Remote / from home",
-        "Team-focused", "Independent working",
-        "Customer-facing", "Not sure yet"
+        "🏢 Professional office setting", "⚡ Fast-paced & busy",
+        "🎨 Creative, relaxed & informal vibe", "🏕️ Outdoors / on-site",
+        "🔬 Lab, studio or specialist facility", "🏠 Remote / work from home",
+        "🤝 Team-focused & collaborative", "🧑‍💻 Independent working",
+        "🗣️ Customer-facing / meeting people", "❓ Not sure yet!"
     ]
 )
 
-st.subheader("7️⃣ What matters most to you?")
+st.subheader("7️⃣ What matters MOST to you in a career?")
 values = st.multiselect(
-    "Pick your top priorities:",
+    "Pick your top priorities — what do you actually want? 💛:",
     [
-        "High earning potential", "Job security", "Creative freedom",
-        "Helping people", "Fast career progression", "Good work-life balance",
-        "Learning new skills", "Making an impact", "Working with people",
-        "Not sure yet"
+        "💷 Good earning potential", "🛡️ Job security & stability", 
+        "🎨 Creative freedom & expression", "🤝 Helping people / making impact", 
+        "🚀 Fast career progression", "⚖️ Good work-life balance",
+        "📖 Continuous learning & growth", "👥 Working with people", 
+        "🏆 Job satisfaction & purpose", "❓ Not sure yet!"
     ]
 )
 
 # ============================================================
-# CAREER DATABASE
+# CAREER DATABASE — FOR EVERY STAGE! 🎓
 # ============================================================
 CAREERS = [
     {
-        "name": "Software Engineer",
-        "industries": ["Technology, Software Development & IT"],
-        "subjects": ["Maths", "Further Maths", "Computer Science", "Physics", "IT / Digital Technology"],
-        "interests": ["Coding, programming & software development", "Gaming, esports & streaming", "Building, making, fixing & hands-on creating", "Working with numbers, data, maths & analysing facts"],
-        "keywords": ["coding", "programming", "software", "python", "technology", "problem-solving", "data", "algorithms"],
-        "environment": ["Professional office setting", "Fast-paced & busy", "Remote / from home", "Team-focused", "Independent working"],
-        "values": ["High earning potential", "Fast career progression", "Learning new skills", "Creative freedom", "Good work-life balance"],
-        "levels": [3, 4, 5, 6, 7],
-        "routes": ["University", "Degree Apprenticeship (Level 6)", "Degree Apprenticeship (Level 7)", "Higher Apprenticeship (Level 4)", "Higher Apprenticeship (Level 5)", "Advanced Apprenticeship (Level 3)"],
-        "skills_to_build": ["Python", "Git & GitHub", "Algorithms", "Data structures", "Software development"]
+        "name": "Software Engineer / Developer",
+        "short_desc": "Build apps, websites, systems — the backbone of the digital world",
+        "industries": ["💻 Technology, Software Development, IT & Digital"],
+        "subjects": ["Maths", "Further Maths", "Computer Science", "IT / Digital Technology", "Data Science"],
+        "interests": ["💻 Coding, programming, tech & software development", "🎮 Gaming, esports, streaming & digital content", "📊 Numbers, data, maths & analysing information"],
+        "keywords": ["coding", "programming", "software", "tech", "problem solving", "logic", "development", "algorithms"],
+        "environment": ["🏢 Professional office setting", "🤝 Team-focused & collaborative", "🏠 Remote / work from home"],
+        "values": ["💷 Good earning potential", "🚀 Fast career progression", "📖 Continuous learning & growth"],
+        "levels": [2, 3, 4, 5, 6, 7],
+        "routes": [
+            "GCSE → BTEC/College → Apprenticeship → Junior Dev",
+            "A Level/IB → Degree Apprenticeship (Level 6/7) → Full-Time Role",
+            "University Degree → Graduate Role / Master's → Senior Roles",
+            "Self-taught / Bootcamp → Portfolio → Junior Position"
+        ],
+        "skills_to_build": ["Python", "HTML/CSS/JS", "Git & GitHub", "Problem Solving", "Logical Thinking", "Communication"]
     },
     {
-        "name": "Data Scientist",
-        "industries": ["Technology, Software Development & IT", "Science, Research, Biotech & Pharmaceuticals", "Business, Finance, Accounting & Banking"],
-        "subjects": ["Maths", "Further Maths", "Computer Science", "Economics", "Physics"],
-        "interests": ["Working with numbers, data, maths & analysing facts", "Science experiments, research & discovering new things", "Coding, programming & software development", "Reading, learning & discovering new things"],
-        "keywords": ["data", "maths", "statistics", "analysis", "research", "coding", "python", "numbers"],
-        "environment": ["Professional office setting", "Lab / research facility", "Remote / from home", "Independent working", "Team-focused"],
-        "values": ["High earning potential", "Learning new skills", "Making an impact", "Fast career progression"],
-        "levels": [4, 5, 6, 7],
-        "routes": ["University", "Degree Apprenticeship (Level 6)", "Degree Apprenticeship (Level 7)", "Higher Apprenticeship (Level 4)", "Higher Apprenticeship (Level 5)"],
-        "skills_to_build": ["Python", "Statistics", "SQL", "Data visualisation", "Machine learning"]
+        "name": "Data Scientist / Analyst",
+        "short_desc": "Turn numbers into stories — help businesses make smart decisions",
+        "industries": ["💻 Technology, Software Development, IT & Digital", "💰 Business, Finance, Accounting, Banking & Economics", "🔬 Science, Research, Biotech & Pharmaceuticals"],
+        "subjects": ["Maths", "Further Maths", "Computer Science", "Data Science", "Economics"],
+        "interests": ["📊 Numbers, data, maths & analysing information", "🔬 Science — experiments, research & discovering how things work", "💻 Coding, programming, tech & software development"],
+        "keywords": ["data", "maths", "statistics", "analysis", "research", "patterns", "insights"],
+        "environment": ["🏢 Professional office setting", "🧑‍💻 Independent working", "🏠 Remote / work from home"],
+        "values": ["💷 Good earning potential", "📖 Continuous learning & growth", "🚀 Fast career progression"],
+        "levels": [3, 4, 5, 6, 7],
+        "routes": [
+            "A Level/IB → Higher/Degree Apprenticeship → Data Analyst",
+            "University Degree → Graduate Scheme → Junior → Senior",
+            "Bootcamp + Portfolio → Junior Analyst → Specialise"
+        ],
+        "skills_to_build": ["Excel", "Python", "SQL", "Statistics", "Data Visualisation", "Critical Thinking"]
     },
     {
         "name": "Cyber Security Analyst",
-        "industries": ["Technology, Software Development & IT", "Law Enforcement, Security & Intelligence"],
-        "subjects": ["Computer Science", "Maths", "Further Maths", "IT / Digital Technology", "Physics"],
-        "interests": ["Coding, programming & software development", "Gaming, esports & streaming", "Debating, politics, current affairs & discussing ideas", "Reading, learning & discovering new things"],
-        "keywords": ["coding", "security", "technology", "problem-solving", "investigation", "research", "computers", "networking"],
-        "environment": ["Professional office setting", "Fast-paced & busy", "Remote / from home", "Team-focused", "Independent working"],
-        "values": ["High earning potential", "Job security", "Learning new skills", "Making an impact", "Fast career progression"],
+        "short_desc": "Protect people, companies & governments from digital threats",
+        "industries": ["💻 Technology, Software Development, IT & Digital", "⚖️ Law, Legal Services, Politics & Government", "🚔 Public Services — Police, Fire, Ambulance, Military"],
+        "subjects": ["Computer Science", "Maths", "IT / Digital Technology"],
+        "interests": ["💻 Coding, programming, tech & software development", "🎮 Gaming, esports, streaming & digital content", "🗣️ Debating, politics, current affairs & discussing ideas"],
+        "keywords": ["security", "networks", "protection", "investigation", "problem solving", "attention to detail"],
+        "environment": ["🏢 Professional office setting", "⚡ Fast-paced & busy", "🤝 Team-focused & collaborative"],
+        "values": ["🛡️ Job security & stability", "💷 Good earning potential", "🤝 Helping people / making impact"],
         "levels": [3, 4, 5, 6, 7],
-        "routes": ["University", "Degree Apprenticeship (Level 6)", "Degree Apprenticeship (Level 7)", "Higher Apprenticeship (Level 4)", "Higher Apprenticeship (Level 5)", "Advanced Apprenticeship (Level 3)"],
-        "skills_to_build": ["Networking", "Python", "Linux", "Cybersecurity fundamentals", "Threat analysis"]
+        "routes": [
+            "GCSE → Advanced Apprenticeship → Junior Role",
+            "A Level/IB → Degree Apprenticeship or Uni → Certified Professional",
+            "Uni → Master's → Government / Senior Roles"
+        ],
+        "skills_to_build": ["Networking", "Linux", "Python", "Risk Analysis", "Attention to Detail", "Ethical Thinking"]
     },
     {
-        "name": "Accountant",
-        "industries": ["Business, Finance, Accounting & Banking"],
-        "subjects": ["Maths", "Further Maths", "Economics", "Business Studies"],
-        "interests": ["Working with numbers, data, maths & analysing facts", "Business ideas, entrepreneurship & starting projects", "Reading, learning & discovering new things"],
-        "keywords": ["numbers", "maths", "finance", "analysis", "organisation", "business", "economics"],
-        "environment": ["Professional office setting", "Fast-paced & busy", "Team-focused", "Independent working"],
-        "values": ["High earning potential", "Job security", "Fast career progression", "Learning new skills", "Good work-life balance"],
-        "levels": [3, 4, 5, 6, 7],
-        "routes": ["University", "Degree Apprenticeship (Level 6)", "Degree Apprenticeship (Level 7)", "Higher Apprenticeship (Level 4)", "Higher Apprenticeship (Level 5)", "School Leaver Programme"],
-        "skills_to_build": ["Financial analysis", "Excel", "Accounting principles", "Communication", "Attention to detail"]
-    },
-    {
-        "name": "Business Analyst",
-        "industries": ["Business, Finance, Accounting & Banking", "Technology, Software Development & IT"],
-        "subjects": ["Maths", "Economics", "Business Studies", "Computer Science"],
-        "interests": ["Business ideas, entrepreneurship & starting projects", "Working with numbers, data, maths & analysing facts", "Planning events, organising & bringing people together", "Coding, programming & software development"],
-        "keywords": ["analysis", "business", "problem-solving", "data", "organisation", "communication", "research", "planning"],
-        "environment": ["Professional office setting", "Team-focused", "Fast-paced & busy", "Independent working"],
-        "values": ["High earning potential", "Fast career progression", "Learning new skills", "Working with people", "Good work-life balance"],
+        "name": "Product Manager",
+        "short_desc": "Bridge between tech & people — decide WHAT gets built & WHY",
+        "industries": ["💻 Technology, Software Development, IT & Digital", "💰 Business, Finance, Accounting, Banking & Economics"],
+        "subjects": ["Business Studies", "Economics", "Computer Science", "Psychology"],
+        "interests": ["💡 Business ideas, entrepreneurship & starting projects", "📋 Planning, organising & bringing people together", "📱 Social media, content creation, marketing & trends"],
+        "keywords": ["product", "strategy", "user", "planning", "communication", "leadership", "research"],
+        "environment": ["🏢 Professional office setting", "🤝 Team-focused & collaborative", "⚡ Fast-paced & busy"],
+        "values": ["🚀 Fast career progression", "💷 Good earning potential", "📖 Continuous learning & growth"],
         "levels": [4, 5, 6, 7],
-        "routes": ["University", "Degree Apprenticeship (Level 6)", "Degree Apprenticeship (Level 7)", "Higher Apprenticeship (Level 4)", "Higher Apprenticeship (Level 5)"],
-        "skills_to_build": ["Excel", "Data analysis", "Presentation skills", "Business strategy", "Stakeholder communication"]
+        "routes": [
+            "Uni → Graduate Scheme → Associate → PM",
+            "Degree Apprenticeship → Junior → Product Manager",
+            "Industry Experience → Transition → Specialise"
+        ],
+        "skills_to_build": ["User Research", "Communication", "Strategic Thinking", "Project Management", "Data Analysis"]
     },
     {
         "name": "Civil Engineer",
-        "industries": ["Engineering — Mechanical, Electrical, Civil & Aerospace", "Construction, Architecture, Surveying & Property"],
-        "subjects": ["Maths", "Further Maths", "Physics", "Engineering", "Geography"],
-        "interests": ["Building, making, fixing & hands-on creating", "Working with numbers, data, maths & analysing facts", "Science experiments, research & discovering new things"],
-        "keywords": ["maths", "engineering", "building", "design", "problem-solving", "physics", "construction"],
-        "environment": ["Working outdoors / on-site", "Professional office setting", "Team-focused", "Fast-paced & busy"],
-        "values": ["High earning potential", "Job security", "Making an impact", "Learning new skills"],
-        "levels": [4, 5, 6, 7],
-        "routes": ["University", "Degree Apprenticeship (Level 6)", "Degree Apprenticeship (Level 7)", "Higher Apprenticeship (Level 4)", "Higher Apprenticeship (Level 5)"],
-        "skills_to_build": ["CAD", "Engineering mathematics", "Project management", "Structural principles", "Technical drawing"]
-    },
-    {
-        "name": "Doctor / Medical Practitioner",
-        "industries": ["Healthcare, Medicine, Nursing & Mental Health"],
-        "subjects": ["Biology", "Chemistry", "Maths", "Physics"],
-        "interests": ["Science experiments, research & discovering new things", "Helping people, mentoring, charity & community work", "Reading, learning & discovering new things"],
-        "keywords": ["biology", "science", "research", "helping", "people", "communication", "problem-solving"],
-        "environment": ["Lab / research facility", "Fast-paced & busy", "Customer-facing", "Team-focused"],
-        "values": ["Helping people", "Making an impact", "Job security", "Learning new skills", "Working with people"],
-        "levels": [6, 7],
-        "routes": ["University"],
-        "skills_to_build": ["Biology", "Chemistry", "Communication", "Critical thinking", "Research"]
-    },
-    {
-        "name": "Graphic Designer",
-        "industries": ["Creative, Media, Design, Film & Journalism", "Marketing, Advertising, PR & Communications"],
-        "subjects": ["Art & Design", "Graphic Design", "Media Studies", "Computer Science"],
-        "interests": ["Art, design, drawing & creative work", "Photography, videography & visual storytelling", "Social media, content creation, marketing & trends", "Fashion, beauty, styling & lifestyle"],
-        "keywords": ["design", "creative", "art", "visual", "branding", "content"],
-        "environment": ["Creative / relaxed vibe", "Remote / from home", "Team-focused", "Independent working"],
-        "values": ["Creative freedom", "Learning new skills", "Good work-life balance", "Making an impact"],
-        "levels": [3, 4, 5, 6],
-        "routes": ["University", "Advanced Apprenticeship (Level 3)", "Higher Apprenticeship (Level 4)", "Higher Apprenticeship (Level 5)"],
-        "skills_to_build": ["Adobe Creative Suite", "Typography", "Branding", "UI design", "Visual communication"]
-    },
-    {
-        "name": "Marketing Executive",
-        "industries": ["Marketing, Advertising, PR & Communications", "Creative, Media, Design, Film & Journalism"],
-        "subjects": ["Business Studies", "Media Studies", "English Language", "Art & Design"],
-        "interests": ["Social media, content creation, marketing & trends", "Writing, journalism, blogging & content creation", "Business ideas, entrepreneurship & starting projects", "Photography, videography & visual storytelling"],
-        "keywords": ["creative", "marketing", "social", "media", "writing", "business", "communication"],
-        "environment": ["Creative / relaxed vibe", "Professional office setting", "Fast-paced & busy", "Team-focused", "Customer-facing"],
-        "values": ["Creative freedom", "Fast career progression", "Working with people", "Making an impact", "Learning new skills"],
+        "short_desc": "Design & build the world we live in — bridges, roads, buildings, infrastructure",
+        "industries": ["🏗️ Engineering — Mechanical, Electrical, Civil, Aerospace", "🏢 Construction, Architecture, Surveying & Property"],
+        "subjects": ["Maths", "Further Maths", "Physics", "Design & Technology"],
+        "interests": ["🔨 Building, making, fixing & hands-on creating", "🔬 Science — experiments, research & discovering how things work", "📊 Numbers, data, maths & analysing information"],
+        "keywords": ["design", "construction", "maths", "physics", "planning", "practical", "problem solving"],
+        "environment": ["🏕️ Outdoors / on-site", "🏢 Professional office setting", "🤝 Team-focused & collaborative"],
+        "values": ["🛡️ Job security & stability", "🤝 Helping people / making impact", "💷 Good earning potential"],
         "levels": [3, 4, 5, 6, 7],
-        "routes": ["University", "Degree Apprenticeship (Level 6)", "Degree Apprenticeship (Level 7)", "Higher Apprenticeship (Level 4)", "Higher Apprenticeship (Level 5)", "Advanced Apprenticeship (Level 3)"],
-        "skills_to_build": ["Social media", "Copywriting", "Analytics", "Campaign planning", "Communication"]
+        "routes": [
+            "GCSE → BTEC → Apprenticeship → Technician → Engineer",
+            "A Level/IB → Degree Apprenticeship → Chartered Status",
+            "Uni → Master's → Senior / Project Lead"
+        ],
+        "skills_to_build": ["CAD Design", "Maths & Physics", "Project Management", "Teamwork", "Practical Skills"]
     },
     {
-        "name": "Lawyer / Solicitor",
-        "industries": ["Law, Legal Services, Politics & Government"],
-        "subjects": ["English Language", "English Literature", "History", "Law", "Philosophy & Ethics"],
-        "interests": ["Debating, politics, current affairs & discussing ideas", "Writing, journalism, blogging & content creation", "Reading, learning & discovering new things"],
-        "keywords": ["debating", "research", "writing", "argument", "communication", "analysis", "law"],
-        "environment": ["Professional office setting", "Fast-paced & busy", "Team-focused", "Independent working", "Customer-facing"],
-        "values": ["High earning potential", "Fast career progression", "Making an impact", "Working with people", "Learning new skills"],
-        "levels": [6, 7],
-        "routes": ["University"],
-        "skills_to_build": ["Legal research", "Writing", "Public speaking", "Critical thinking", "Negotiation"]
+        "name": "Marketing / Brand Strategist",
+        "short_desc": "Tell stories, build brands & connect people with ideas",
+        "industries": ["📣 Marketing, Advertising, PR & Communications", "🎬 Creative, Media, Design, Film, Gaming & Journalism"],
+        "subjects": ["English Language", "Business Studies", "Media", "Psychology", "Art & Design"],
+        "interests": ["📱 Social media, content creation, marketing & trends", "✍️ Writing, storytelling, blogging & journalism", "🎨 Art, design, creativity & making things look good"],
+        "keywords": ["creative", "communication", "content", "strategy", "people", "trends", "writing"],
+        "environment": ["🎨 Creative, relaxed & informal vibe", "⚡ Fast-paced & busy", "🤝 Team-focused & collaborative"],
+        "values": ["🎨 Creative freedom & expression", "🚀 Fast career progression", "👥 Working with people"],
+        "levels": [2, 3, 4, 5, 6, 7],
+        "routes": [
+            "GCSE → Apprenticeship → Junior → Executive",
+            "College/Uni → Degree Apprenticeship → Specialist",
+            "Portfolio → Freelance → Agency → Senior"
+        ],
+        "skills_to_build": ["Social Media", "Copywriting", "Analytics", "Creativity", "Communication", "Research"]
     },
     {
-        "name": "Teacher",
-        "industries": ["Education, Teaching & Training"],
-        "subjects": ["Maths", "English Language", "English Literature", "Biology", "Chemistry", "Physics", "Computer Science", "History", "Geography"],
-        "interests": ["Teaching, explaining, tutoring & supporting others", "Helping people, mentoring, charity & community work", "Reading, learning & discovering new things"],
-        "keywords": ["teaching", "communication", "helping", "leadership", "patience", "explaining", "people"],
-        "environment": ["Customer-facing", "Team-focused", "Professional office setting", "Fast-paced & busy"],
-        "values": ["Helping people", "Making an impact", "Job security", "Working with people", "Learning new skills"],
-        "levels": [3, 6, 7],
-        "routes": ["University", "Degree Apprenticeship (Level 6)", "Degree Apprenticeship (Level 7)"],
-        "skills_to_build": ["Public speaking", "Lesson planning", "Communication", "Leadership", "Subject knowledge"]
+        "name": "Healthcare Professional / Nurse",
+        "short_desc": "Care for people, save lives, make a real difference every single day",
+        "industries": ["🏥 Healthcare, Medicine, Nursing & Mental Health"],
+        "subjects": ["Biology", "Chemistry", "Combined Science (GCSE)", "Psychology"],
+        "interests": ["🤝 Helping people, mentoring, charity & making a difference", "🔬 Science — experiments, research & discovering how things work"],
+        "keywords": ["caring", "people", "health", "empathy", "communication", "patience", "science"],
+        "environment": ["⚡ Fast-paced & busy", "🗣️ Customer-facing / meeting people", "🤝 Team-focused & collaborative"],
+        "values": ["🤝 Helping people / making impact", "🛡️ Job security & stability", "🏆 Job satisfaction & purpose"],
+        "levels": [2, 3, 4, 5, 6, 7],
+        "routes": [
+            "GCSE → Care Certificate → Apprenticeship → Assistant",
+            "A Level/IB → Nursing Degree / Degree Apprenticeship → Registered Nurse",
+            "Uni → Master's → Specialist / Advanced Practitioner"
+        ],
+        "skills_to_build": ["Empathy", "Communication", "Teamwork", "Resilience", "Organisation", "Attention to Detail"]
     },
     {
-        "name": "Project Manager",
-        "industries": ["Business, Finance, Accounting & Banking", "Construction, Architecture, Surveying & Property", "Technology, Software Development & IT"],
-        "subjects": ["Business Studies", "Economics", "Maths", "Computer Science"],
-        "interests": ["Planning events, organising & bringing people together", "Business ideas, entrepreneurship & starting projects", "Building, making, fixing & hands-on creating"],
-        "keywords": ["planning", "organisation", "leadership", "teamwork", "communication", "project", "problem-solving"],
-        "environment": ["Professional office setting", "Fast-paced & busy", "Team-focused", "Customer-facing"],
-        "values": ["Fast career progression", "Working with people", "High earning potential", "Making an impact", "Learning new skills"],
+        "name": "Business Analyst / Consultant",
+        "short_desc": "Help organisations work better — solve problems, improve systems, drive change",
+        "industries": ["💰 Business, Finance, Accounting, Banking & Economics", "💻 Technology, Software Development, IT & Digital"],
+        "subjects": ["Business Studies", "Economics", "Maths", "Psychology"],
+        "interests": ["💡 Business ideas, entrepreneurship & starting projects", "📊 Numbers, data, maths & analysing information", "🗣️ Debating, politics, current affairs & discussing ideas"],
+        "keywords": ["analysis", "problem solving", "strategy", "communication", "data", "planning", "improvement"],
+        "environment": ["🏢 Professional office setting", "🤝 Team-focused & collaborative", "⚡ Fast-paced & busy"],
+        "values": ["💷 Good earning potential", "🚀 Fast career progression", "📖 Continuous learning & growth"],
         "levels": [4, 5, 6, 7],
-        "routes": ["University", "Degree Apprenticeship (Level 6)", "Degree Apprenticeship (Level 7)", "Higher Apprenticeship (Level 4)", "Higher Apprenticeship (Level 5)"],
-        "skills_to_build": ["Leadership", "Planning", "Communication", "Risk management", "Organisation"]
+        "routes": [
+            "Uni → Graduate Scheme → Junior → Consultant",
+            "Degree Apprenticeship → Analyst → Senior",
+            "Industry Experience → Internal Promotion"
+        ],
+        "skills_to_build": ["Data Analysis", "Communication", "Critical Thinking", "Project Management", "Stakeholder Management"]
     },
     {
-        "name": "Psychologist",
-        "industries": ["Healthcare, Medicine, Nursing & Mental Health", "Education, Teaching & Training"],
-        "subjects": ["Psychology", "Biology", "Maths", "English Language"],
-        "interests": ["Helping people, mentoring, charity & community work", "Science experiments, research & discovering new things", "Teaching, explaining, tutoring & supporting others"],
-        "keywords": ["psychology", "research", "people", "helping", "communication", "empathy", "analysis"],
-        "environment": ["Customer-facing", "Professional office setting", "Lab / research facility", "Team-focused"],
-        "values": ["Helping people", "Making an impact", "Learning new skills", "Working with people"],
-        "levels": [6, 7],
-        "routes": ["University"],
-        "skills_to_build": ["Research", "Statistics", "Communication", "Critical thinking", "Psychology"]
+        "name": "Teacher / Educator",
+        "short_desc": "Shape the future — inspire, teach & make a lifelong impact",
+        "industries": ["📚 Education, Teaching & Training"],
+        "subjects": ["English Language", "Maths", "Biology", "Chemistry", "Physics", "History", "Geography"],
+        "interests": ["👩‍🏫 Teaching, explaining & helping others learn", "🤝 Helping people, mentoring, charity & making a difference", "📚 Reading, researching & learning new things"],
+        "keywords": ["teaching", "people", "communication", "patience", "leadership", "learning", "empathy"],
+        "environment": ["🗣️ Customer-facing / meeting people", "🤝 Team-focused & collaborative", "⚡ Fast-paced & busy"],
+        "values": ["🤝 Helping people / making impact", "🛡️ Job security & stability", "🏆 Job satisfaction & purpose"],
+        "levels": [3, 6, 7],
+        "routes": [
+            "A Level/IB → Uni + QTS → NQT → Teacher",
+            "Degree Apprenticeship → Qualified Teacher",
+            "Subject Specialism → Further Education / Lecturing"
+        ],
+        "skills_to_build": ["Communication", "Public Speaking", "Empathy", "Organisation", "Leadership", "Subject Knowledge"]
     },
     {
-        "name": "Digital Marketer / Social Media Manager",
-        "industries": ["Marketing, Advertising, PR & Communications", "Creative, Media, Design, Film & Journalism"],
-        "subjects": ["Media Studies", "Business Studies", "English Language", "Art & Design"],
-        "interests": ["Social media, content creation, marketing & trends", "Writing, journalism, blogging & content creation", "Photography, videography & visual storytelling", "Business ideas, entrepreneurship & starting projects"],
-        "keywords": ["social", "media", "content", "marketing", "creative", "writing", "communication"],
-        "environment": ["Creative / relaxed vibe", "Remote / from home", "Team-focused", "Fast-paced & busy"],
-        "values": ["Creative freedom", "Good work-life balance", "Fast career progression", "Learning new skills"],
-        "levels": [3, 4, 5, 6],
-        "routes": ["University", "Degree Apprenticeship (Level 6)", "Higher Apprenticeship (Level 4)", "Higher Apprenticeship (Level 5)", "Advanced Apprenticeship (Level 3)"],
-        "skills_to_build": ["Social media strategy", "Content creation", "Analytics", "Copywriting", "Marketing"]
+        "name": "UX / UI Designer",
+        "short_desc": "Design how digital products feel — make things beautiful AND easy to use",
+        "industries": ["🎬 Creative, Media, Design, Film, Gaming & Journalism", "💻 Technology, Software Development, IT & Digital"],
+        "subjects": ["Art & Design", "Graphic Design", "Computer Science", "Psychology"],
+        "interests": ["🎨 Art, design, creativity & making things look good", "📸 Photography, videography & visual storytelling", "💻 Coding, programming, tech & software development"],
+        "keywords": ["design", "user", "creative", "visual", "empathy", "research", "problem solving"],
+        "environment": ["🎨 Creative, relaxed & informal vibe", "🧑‍💻 Independent working", "🏠 Remote / work from home"],
+        "values": ["🎨 Creative freedom & expression", "📖 Continuous learning & growth", "⚖️ Good work-life balance"],
+        "levels": [2, 3, 4, 5, 6, 7],
+        "routes": [
+            "GCSE → Art/Design → Apprenticeship → Junior Designer",
+            "College/Uni → Degree Apprenticeship → Mid-Level",
+            "Portfolio → Freelance → Agency → Senior"
+        ],
+        "skills_to_build": ["Figma", "User Research", "Visual Design", "Empathy", "Problem Solving", "Communication"]
     },
     {
-        "name": "Architect",
-        "industries": ["Construction, Architecture, Surveying & Property", "Creative, Media, Design, Film & Journalism"],
-        "subjects": ["Maths", "Art & Design", "Graphic Design", "Physics", "Engineering"],
-        "interests": ["Art, design, drawing & creative work", "Building, making, fixing & hands-on creating", "Photography, videography & visual storytelling"],
-        "keywords": ["design", "art", "building", "maths", "creative", "architecture", "drawing"],
-        "environment": ["Creative / relaxed vibe", "Professional office setting", "Working outdoors / on-site", "Team-focused"],
-        "values": ["Creative freedom", "Making an impact", "Learning new skills", "Working with people"],
-        "levels": [6, 7],
-        "routes": ["University", "Degree Apprenticeship (Level 6)", "Degree Apprenticeship (Level 7)"],
-        "skills_to_build": ["CAD", "Technical drawing", "Design", "Mathematics", "Project management"]
+        "name": "Financial Analyst / Accountant",
+        "short_desc": "Manage money, guide decisions — the heartbeat of every organisation",
+        "industries": ["💰 Business, Finance, Accounting, Banking & Economics"],
+        "subjects": ["Maths", "Further Maths", "Business Studies", "Economics"],
+        "interests": ["📊 Numbers, data, maths & analysing information", "💡 Business ideas, entrepreneurship & starting projects"],
+        "keywords": ["numbers", "finance", "analysis", "accuracy", "organisation", "business", "detail"],
+        "environment": ["🏢 Professional office setting", "🤝 Team-focused & collaborative", "🧑‍💻 Independent working"],
+        "values": ["💷 Good earning potential", "🛡️ Job security & stability", "🚀 Fast career progression"],
+        "levels": [2, 3, 4, 5, 6, 7],
+        "routes": [
+            "GCSE → Apprenticeship → AAT → Qualified",
+            "A Level/IB → Degree Apprenticeship / Uni → ACCA/CIMA",
+            "Graduate → Chartered → Senior / Partner"
+        ],
+        "skills_to_build": ["Excel", "Attention to Detail", "Analysis", "Organisation", "Communication", "Integrity"]
     },
     {
-        "name": "Environmental Scientist",
-        "industries": ["Environment, Sustainability, Green Energy & Conservation", "Science, Research, Biotech & Pharmaceuticals"],
-        "subjects": ["Biology", "Chemistry", "Geography", "Physics"],
-        "interests": ["Nature, animals, wildlife & the environment", "Science experiments, research & discovering new things", "Reading, learning & discovering new things"],
-        "keywords": ["science", "environment", "nature", "research", "biology", "analysis", "sustainability"],
-        "environment": ["Lab / research facility", "Working outdoors / on-site", "Independent working", "Team-focused"],
-        "values": ["Making an impact", "Learning new skills", "Job security"],
-        "levels": [6, 7],
-        "routes": ["University", "Degree Apprenticeship (Level 6)", "Degree Apprenticeship (Level 7)"],
-        "skills_to_build": ["Research", "Data analysis", "Environmental science", "Fieldwork", "Scientific writing"]
-    },
-    {
-        "name": "Sports Coach",
-        "industries": ["Sports, Fitness, Leisure & Nutrition"],
-        "subjects": ["PE / Sports Science", "Biology", "Psychology"],
-        "interests": ["Sports, fitness, training & outdoor activities", "Teaching, explaining, tutoring & supporting others", "Helping people, mentoring, charity & community work"],
-        "keywords": ["sports", "fitness", "leadership", "teamwork", "motivation", "helping", "communication"],
-        "environment": ["Working outdoors / on-site", "Customer-facing", "Team-focused", "Fast-paced & busy"],
-        "values": ["Helping people", "Making an impact", "Working with people", "Job security"],
-        "levels": [3, 4, 5, 6],
-        "routes": ["Advanced Apprenticeship (Level 3)", "Higher Apprenticeship (Level 4)", "Higher Apprenticeship (Level 5)", "University"],
-        "skills_to_build": ["Leadership", "Coaching", "Communication", "Sports science", "Motivation"]
+        "name": "Sustainability / Environmental Scientist",
+        "short_desc": "Fight climate change — protect our planet for future generations",
+        "industries": ["🌱 Environment, Sustainability, Green Energy & Conservation", "🔬 Science, Research, Biotech & Pharmaceuticals"],
+        "subjects": ["Biology", "Chemistry", "Physics", "Geography"],
+        "interests": ["🌿 Nature, animals, wildlife & the environment", "🔬 Science — experiments, research & discovering how things work", "🗣️ Debating, politics, current affairs & discussing ideas"],
+        "keywords": ["environment", "science", "sustainability", "research", "conservation", "data", "policy"],
+        "environment": ["🏕️ Outdoors / on-site", "🔬 Lab, studio or specialist facility", "🤝 Team-focused & collaborative"],
+        "values": ["🤝 Helping people / making impact", "📖 Continuous learning & growth", "🏆 Job satisfaction & purpose"],
+        "levels": [3, 4, 5, 6, 7],
+        "routes": [
+            "A Level/IB → Degree Apprenticeship → Junior Role",
+            "Uni → Master's → Research / Policy / NGO",
+            "Experience → Specialise → Senior / Consultant"
+        ],
+        "skills_to_build": ["Research", "Data Analysis", "Fieldwork", "Scientific Writing", "Advocacy", "Project Management"]
     }
 ]
 
 # ============================================================
-# MATCHING FUNCTION — IB SL & HL FAIR MATCHING ✅
+# MATCHING FUNCTION — FOR EVERYONE, FAIR & ACCURATE ✅
 # ============================================================
 def calculate_match(career):
     score = 0
@@ -420,31 +446,36 @@ def calculate_match(career):
     selected_levels = set()
 
     for item in pathway:
-        if "Level 2" in item:
+        if "GCSE" in item or "Level 2" in item:
             selected_levels.add(2)
         elif "Level 3" in item or "Standard Level (IB SL)" in item:
             selected_levels.add(3)
-        elif "Level 4" in item:
+        elif "Level 4" in item or "Higher" in item and "Degree" not in item:
             selected_levels.add(4)
         elif "Level 5" in item:
             selected_levels.add(5)
-        elif "Level 6" in item or "University" in item or "Higher Level (IB HL)" in item:
+        elif "Level 6" in item or "University" in item or "Higher Level (IB HL)" in item or "Graduate" in item:
             selected_levels.update([3, 4, 5, 6, 7])
-        elif "Level 7" in item:
-            selected_levels.add(7)
-        elif item in ["A Levels", "T Level", "BTEC (Level 3 / Extended Diploma)", "CTEC", "OCR Cambridge Technical", "School Leaver Programme"]:
+        elif "Level 7" in item or "Postgraduate" in item:
+            selected_levels.update([4, 5, 6, 7])
+        elif "Working" in item or "Career Change" in item:
+            selected_levels.update([2, 3, 4, 5, 6, 7])
+        elif item in ["📚 A Levels", "🔧 T Level", "📖 BTEC / CTEC / Cambridge Technical"]:
             selected_levels.add(3)
-        elif item == "Access to HE":
-            selected_levels.update([3, 4, 5])
+        elif item == "❓ Not sure yet — still figuring it all out!":
+            pass
 
-    if not pathway or "Not sure yet" in pathway:
+    if not pathway or "❓ Not sure yet — still figuring it all out!" in pathway:
         score += 15
     else:
         if selected_levels.intersection(set(career["levels"])):
             score += 15
-            reasons.append("your chosen pathway can lead towards this career")
+            reasons.append("your current stage can lead directly towards this career")
+        else:
+            score += 10
+            reasons.append("this career is still reachable with further steps")
 
-    if industries and "Not sure yet" not in industries:
+    if industries and "❓ Not sure yet — still exploring!" not in industries:
         industry_matches = set(industries).intersection(set(career["industries"]))
         if industry_matches:
             score += 20
@@ -457,16 +488,16 @@ def calculate_match(career):
         if subject_matches:
             subject_score = min(len(subject_matches) * 7, 20)
             score += subject_score
-            reasons.append("your subjects are relevant to this career")
+            reasons.append("your subjects are directly relevant")
     else:
         score += 10
 
-    if interests and "Not sure yet" not in interests:
+    if interests and "❓ Not sure yet — still exploring!" not in interests:
         interest_matches = set(interests).intersection(set(career["interests"]))
         if interest_matches:
             interest_score = min(len(interest_matches) * 7, 20)
             score += interest_score
-            reasons.append("your interests match this career")
+            reasons.append("your personal interests match this career")
     else:
         score += 10
 
@@ -476,17 +507,17 @@ def calculate_match(career):
         skill_score = min(keyword_matches * 4, 15)
         score += skill_score
         if keyword_matches:
-            reasons.append("some of your skills could transfer well")
+            reasons.append("your existing skills are a great foundation")
     else:
         score += 7
 
-    if environment and "Not sure yet" not in environment:
+    if environment and "❓ Not sure yet!" not in environment:
         env_matches = set(environment).intersection(set(career["environment"]))
         score += min(len(env_matches) * 2, 5)
     else:
         score += 3
 
-    if values and "Not sure yet" not in values:
+    if values and "❓ Not sure yet!" not in values:
         val_matches = set(values).intersection(set(career["values"]))
         score += min(len(val_matches) * 2, 5)
     else:
@@ -499,7 +530,7 @@ def calculate_match(career):
 # ============================================================
 if st.button("🔍 Find My Career Matches", type="primary", use_container_width=True):
     if not any([pathway, subjects, skills.strip(), interests, industries, environment, values]):
-        st.warning("Please answer at least a few questions before finding your matches.")
+        st.warning("Please answer at least a few questions before finding your matches — you've got this! 💛")
     else:
         results = []
         for career in CAREERS:
@@ -510,13 +541,14 @@ if st.button("🔍 Find My Career Matches", type="primary", use_container_width=
         st.session_state.submitted = False
 
 # ============================================================
-# DISPLAY RESULTS
+# DISPLAY RESULTS — CLEAR, INSPIRING, ACTIONABLE ✅
 # ============================================================
 if st.session_state.results:
     top_results = st.session_state.results[:5]
     st.markdown("---")
     st.header("✨ Your PathPilot Results")
-    st.write("These matches are based on the information you provided. They are designed to help you explore options — not decide your future for you.")
+    st.subheader("Here's what fits YOU — your skills, your interests, YOUR future.")
+    st.write("These are suggestions to help you explore — NOT final answers. You can do ANYTHING you set your mind to! 💛")
 
     for idx, result in enumerate(top_results, start=1):
         medal = ["🥇", "🥈", "🥉"][idx-1] if idx <= 3 else f"{idx}."
@@ -528,37 +560,75 @@ if st.session_state.results:
         col1, col2 = st.columns([4, 1])
         with col1:
             st.subheader(f"{medal} {career['name']}")
+            st.caption(f"💡 {career['short_desc']}")
         with col2:
             st.markdown(f'<div class="match-score">{score}%</div><div class="small-text">Match</div>', unsafe_allow_html=True)
         st.progress(score / 100)
-        st.markdown("### 💡 Why this could suit you")
+
+        st.markdown("### ✅ Why this fits YOU")
         unique_reasons = list(dict.fromkeys(reasons))
         if unique_reasons:
             for reason in unique_reasons[:4]:
                 st.write(f"✓ {reason.capitalize()}.")
         else:
-            st.write("Your answers show some potential alignment with this career.")
-        st.markdown("### 🎓 Possible routes")
+            st.write("Your profile shows strong potential — worth exploring!")
+
+        st.markdown("### 🗺️ Your possible routes from HERE")
         for route in career["routes"]:
             st.write(f"• {route}")
-        st.markdown("### 🛠️ Skills worth developing")
+
+        st.markdown("### 🛠️ Skills to START building TODAY")
         st.write(" • ".join(career["skills_to_build"]))
         st.markdown("</div>", unsafe_allow_html=True)
 
     # ========================================================
-    # SIMPLE SUBMIT — NO GOOGLE SHEETS NEEDED
+    # SUBMIT & SEE ALL RESPONSES — EVERYONE CAN CONTRIBUTE!
     # ========================================================
     st.markdown("---")
-    st.subheader("📊 Help us improve PathPilot")
-    st.write("Want to help us understand which pathways and careers young people are exploring?")
-    st.caption("We don't ask for your name or email address. Your responses are used to understand trends.")
+    st.subheader("📊 Be part of the PathPilot community")
+    st.write("Submit your results → see what EVERYONE else is discovering too! 💛")
 
-    if not st.session_state.submitted:
-        if st.button("📋 Submit My Results", use_container_width=True):
-            st.session_state.submitted = True
-            st.success("✅ Thank you! Your feedback helps us improve PathPilot for everyone.")
-    else:
-        st.success("✅ Your results have already been submitted. Thank you for helping PathPilot! 💛")
+    col_submit, col_view = st.columns([1, 1])
+
+    with col_submit:
+        if not st.session_state.submitted:
+            if st.button("📋 Submit My Results", use_container_width=True, type="primary"):
+                top_matches = [r["career"]["name"] for r in st.session_state.results[:3]]
+                scores = [r["score"] for r in st.session_state.results[:3]]
+                response = {
+                    "time": datetime.now().strftime("%d/%m/%Y %H:%M"),
+                    "stage": ", ".join(pathway[:2]),
+                    "top_match": top_matches[0] if top_matches else "-",
+                    "match_score": scores[0] if scores else 0,
+                    "industry": ", ".join(industries[:2]) if industries else "-"
+                }
+                st.session_state.all_responses.append(response)
+                st.session_state.submitted = True
+                st.success("✅ Submitted! Thank you for being part of PathPilot! 💛")
+        else:
+            st.success("✅ Already submitted — thank you for contributing!")
+
+    with col_view:
+        if st.button("👁️ See All Community Results", use_container_width=True):
+            st.session_state.show_responses = not st.session_state.get("show_responses", False)
+
+    if st.session_state.get("show_responses", False):
+        st.markdown("---")
+        st.subheader(f"📋 Community Results — {len(st.session_state.all_responses)} people explored!")
+        if st.session_state.all_responses:
+            avg_score = round(sum(r["match_score"] for r in st.session_state.all_responses) / len(st.session_state.all_responses))
+            st.metric("📊 Average Match Score", f"{avg_score}%")
+            for i, resp in enumerate(reversed(st.session_state.all_responses), 1):
+                st.markdown(f"""
+                <div class="response-box">
+                <strong>#{len(st.session_state.all_responses) - i + 1}</strong> — {resp['time']}<br>
+                🎓 Stage: <em>{resp['stage']}</em><br>
+                🥇 Top Match: <strong>{resp['top_match']}</strong> ({resp['match_score']}%)<br>
+                🏭 Interests: {resp['industry']}
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("No responses yet — be the first! 🎉")
 
 # ============================================================
 # FOOTER — YOUR SLOGAN
