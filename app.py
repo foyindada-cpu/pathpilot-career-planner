@@ -1,555 +1,2079 @@
 import streamlit as st
-from datetime import datetime
+from urllib.parse import urlencode
 
-# ==============================================
-# 👇👇👇 PASTE YOUR GOOGLE FORM LINK HERE! 👇👇👇
-# ==============================================
-GOOGLE_FORM_LINK = " https://docs.google.com/spreadsheets/d/1XFLfhDqtm8whNvZsAppokGzLf0AAPrgv7fy_y0ENrJQ/edit?gid=0#gid=0 /viewform"
-# ==============================================
+# ============================================================
+# PATHPILOT
+# Career & Pathway Matching Platform
+# ============================================================
 
-# ------------------------------
-# PAGE SETUP
-# ------------------------------
 st.set_page_config(
-    page_title="PathPilot — Find YOUR Perfect Path",
-    page_icon="🎯",
+    page_title="PathPilot — Find Your Future",
+    page_icon="🚀",
     layout="wide"
 )
 
-# ------------------------------
-# 🌍 ALL-INCLUSIVE CAREERS — FOR EVERY STUDENT!
-# GCSE • BTEC • T Level • A-Level • Apprenticeship • Uni
-# ------------------------------
-CAREERS = [
-    # === TECHNOLOGY ===
-    {
-        "career": "Software Engineer",
-        "category": "Technology",
-        "subjects": ["Computer Science", "Maths", "IT"],
-        "skills": ["Programming", "Problem Solving", "Logical Thinking", "Attention to Detail"],
-        "interests": ["coding", "software", "apps", "technology", "building", "systems"],
-        "description": "Design, build, test and maintain software applications and systems.",
-        "skills_to_develop": ["Python", "JavaScript", "Git", "Data Structures", "SQL"],
-        "routes": ["GCSE Pathway", "BTEC IT", "T Level Digital", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Cybersecurity Analyst",
-        "category": "Technology",
-        "subjects": ["Computer Science", "Maths", "IT"],
-        "skills": ["Problem Solving", "Logical Thinking", "Attention to Detail", "Integrity"],
-        "interests": ["security", "protection", "networks", "hacking", "safety", "defence"],
-        "description": "Protect computer systems and data from cyber threats and attacks.",
-        "skills_to_develop": ["Network Security", "Python", "Cryptography", "Risk Assessment"],
-        "routes": ["GCSE Pathway", "BTEC IT", "T Level Digital", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Data Scientist",
-        "category": "Technology",
-        "subjects": ["Maths", "Computer Science", "Statistics"],
-        "skills": ["Analytical Skills", "Critical Thinking", "Problem Solving", "Curiosity"],
-        "interests": ["data", "numbers", "analysis", "patterns", "ai", "machine learning"],
-        "description": "Analyse complex data to find insights and solve real-world problems.",
-        "skills_to_develop": ["Python", "SQL", "Statistics", "Machine Learning"],
-        "routes": ["BTEC", "T Level", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Web Developer",
-        "category": "Technology",
-        "subjects": ["Computer Science", "Art", "Design", "IT"],
-        "skills": ["Creativity", "Attention to Detail", "Problem Solving", "Design"],
-        "interests": ["websites", "design", "ui", "user experience", "visuals", "frontend"],
-        "description": "Build, design and maintain websites and web applications.",
-        "skills_to_develop": ["HTML/CSS", "JavaScript", "React", "UI Design"],
-        "routes": ["GCSE Pathway", "BTEC IT", "T Level Digital", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "IT Support Technician",
-        "category": "Technology",
-        "subjects": ["Computer Science", "IT"],
-        "skills": ["Communication", "Problem Solving", "Patience", "Empathy"],
-        "interests": ["helping people", "fixing", "hardware", "tech", "troubleshooting"],
-        "description": "Help people and organisations with computer systems and technical issues.",
-        "skills_to_develop": ["Troubleshooting", "Networking", "Customer Service"],
-        "routes": ["GCSE Pathway", "BTEC IT", "T Level Digital", "Apprenticeship", "A-Level", "University"]
-    },
-    {
-        "career": "Video Game Developer",
-        "category": "Technology",
-        "subjects": ["Computer Science", "Art", "Design", "IT"],
-        "skills": ["Creativity", "Problem Solving", "Storytelling", "Programming"],
-        "interests": ["gaming", "games", "creativity", "worldbuilding", "interactive"],
-        "description": "Design and code video games — bring worlds and stories to life!",
-        "skills_to_develop": ["C#", "Unity", "Game Design", "3D Modelling"],
-        "routes": ["GCSE Pathway", "BTEC IT", "T Level Digital", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "UX / UI Designer",
-        "category": "Technology",
-        "subjects": ["Design", "Art", "IT"],
-        "skills": ["Empathy", "Creativity", "User Focus", "Visual Design"],
-        "interests": ["people", "design", "experience", "how things feel", "usability"],
-        "description": "Design digital products that feel natural, beautiful and easy to use for everyone.",
-        "skills_to_develop": ["Figma", "User Research", "Prototyping"],
-        "routes": ["GCSE Pathway", "BTEC Art/Design", "T Level Digital", "A-Level", "Degree Apprenticeship", "University"]
-    },
+# ============================================================
+# GOOGLE FORM SETTINGS
+# ============================================================
 
-    # === LAW & LEGAL ===
-    {
-        "career": "Solicitor / Lawyer",
-        "category": "Law",
-        "subjects": ["Law", "English", "History", "Politics"],
-        "skills": ["Communication", "Critical Thinking", "Research", "Debate", "Writing"],
-        "interests": ["justice", "rules", "rights", "argument", "helping people", "society"],
-        "description": "Advise and represent clients in legal matters — interpret and apply the law.",
-        "skills_to_develop": ["Legal Research", "Public Speaking", "Negotiation", "Writing"],
-        "routes": ["BTEC Law", "T Level Legal", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Paralegal / Legal Assistant",
-        "category": "Law",
-        "subjects": ["Law", "English", "Business"],
-        "skills": ["Organisation", "Attention to Detail", "Research", "Communication"],
-        "interests": ["documents", "cases", "law", "organisation", "support"],
-        "description": "Support lawyers with research, documents and case preparation — great starting point!",
-        "skills_to_develop": ["Legal Research", "Document Management", "Case Prep"],
-        "routes": ["GCSE Pathway", "BTEC Law", "T Level Legal", "Apprenticeship", "A-Level", "University"]
-    },
-    {
-        "career": "Human Rights Lawyer",
-        "category": "Law",
-        "subjects": ["Law", "Politics", "Sociology", "English"],
-        "skills": ["Empathy", "Courage", "Research", "Persuasion", "Advocacy"],
-        "interests": ["equality", "fairness", "people", "change", "justice", "rights"],
-        "description": "Fight for equality and protect people's rights — make a real difference to society.",
-        "skills_to_develop": ["International Law", "Advocacy", "Policy"],
-        "routes": ["BTEC", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Mediator / Conflict Resolver",
-        "category": "Law",
-        "subjects": ["Psychology", "Law", "English", "Health & Social Care"],
-        "skills": ["Listening", "Neutrality", "Empathy", "Communication", "Patience"],
-        "interests": ["resolution", "people", "fairness", "agreement", "peace", "understanding"],
-        "description": "Help people resolve disputes without court — find fair solutions together.",
-        "skills_to_develop": ["Conflict Resolution", "Active Listening", "Negotiation"],
-        "routes": ["GCSE Pathway", "BTEC", "T Level", "A-Level", "Degree Apprenticeship", "University"]
-    },
+# Paste your Google Form VIEWFORM link here.
+# Example:
+# https://docs.google.com/forms/d/e/XXXXXXXX/viewform
 
-    # === FINANCE & BUSINESS ===
-    {
-        "career": "Accountant",
-        "category": "Finance",
-        "subjects": ["Maths", "Business", "Economics"],
-        "skills": ["Attention to Detail", "Organisation", "Trustworthiness", "Analytical"],
-        "interests": ["numbers", "money", "business", "tax", "reports", "accuracy"],
-        "description": "Manage financial records, taxes and budgets for individuals and companies.",
-        "skills_to_develop": ["Financial Reporting", "Tax", "Spreadsheets", "Auditing"],
-        "routes": ["GCSE Pathway", "BTEC Business", "T Level Management", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Business Manager / Entrepreneur",
-        "category": "Business",
-        "subjects": ["Business", "Economics", "English"],
-        "skills": ["Leadership", "Communication", "Organisation", "Decision Making", "Resilience"],
-        "interests": ["business", "leading", "ideas", "growth", "teamwork", "innovation"],
-        "description": "Lead teams, run operations or build your own business from scratch.",
-        "skills_to_develop": ["Leadership", "Strategy", "Marketing", "Finance"],
-        "routes": ["GCSE Pathway", "BTEC Business", "T Level Management", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Human Resources (HR) Manager",
-        "category": "Business",
-        "subjects": ["Psychology", "Business", "English"],
-        "skills": ["Communication", "Empathy", "Organisation", "Conflict Resolution"],
-        "interests": ["people", "hiring", "culture", "teams", "development", "support"],
-        "description": "Manage hiring, training and wellbeing — make companies great places to work.",
-        "skills_to_develop": ["People Management", "Employment Law", "Recruitment"],
-        "routes": ["BTEC Business", "T Level Management", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Marketing Manager",
-        "category": "Business",
-        "subjects": ["Business", "Art", "English", "Psychology"],
-        "skills": ["Creativity", "Communication", "Social Skills", "Analytical"],
-        "interests": ["creativity", "social media", "branding", "people", "advertising", "trends"],
-        "description": "Promote products and brands — connect businesses with their audiences.",
-        "skills_to_develop": ["Social Media", "Branding", "Content Creation", "Analytics"],
-        "routes": ["GCSE Pathway", "BTEC Business", "T Level Digital", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Supply Chain / Logistics Manager",
-        "category": "Business",
-        "subjects": ["Business", "Maths", "Geography"],
-        "skills": ["Organisation", "Problem Solving", "Planning", "Communication"],
-        "interests": ["moving things", "organisation", "global", "delivery", "systems", "planning"],
-        "description": "Manage how goods get made, moved and delivered — keep the world running!",
-        "skills_to_develop": ["Logistics", "Project Management", "Global Trade"],
-        "routes": ["GCSE Pathway", "BTEC Business", "T Level", "A-Level", "Degree Apprenticeship", "University"]
-    },
+GOOGLE_FORM_LINK = "https://docs.google.com/spreadsheets/d/1XFLfhDqtm8whNvZsAppokGzLf0AAPrgv7fy_y0ENrJQ/edit?gid=0#gid=0/viewform"
 
-    # === HEALTHCARE & COMMUNITY CARE ===
-    {
-        "career": "Nurse",
-        "category": "Healthcare",
-        "subjects": ["Biology", "Chemistry", "Psychology", "Health & Social Care"],
-        "skills": ["Empathy", "Patience", "Communication", "Stamina", "Compassion"],
-        "interests": ["helping people", "caring", "health", "patients", "support", "wellbeing"],
-        "description": "Care for patients, give treatment and support people through illness and recovery.",
-        "skills_to_develop": ["Patient Care", "Medical Knowledge", "First Aid"],
-        "routes": ["BTEC Health & Social", "T Level Health", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Psychologist / Therapist",
-        "category": "Healthcare",
-        "subjects": ["Psychology", "Biology", "English"],
-        "skills": ["Empathy", "Listening", "Communication", "Patience", "Trust"],
-        "interests": ["mind", "behaviour", "helping people", "feelings", "mental health", "understanding"],
-        "description": "Understand human behaviour — help people with mental health and wellbeing.",
-        "skills_to_develop": ["Psychology", "Active Listening", "Counselling", "Research"],
-        "routes": ["BTEC Health & Social", "A-Level", "University"]
-    },
-    {
-        "career": "Midwife",
-        "category": "Healthcare",
-        "subjects": ["Biology", "Psychology", "Health & Social Care"],
-        "skills": ["Empathy", "Calmness", "Communication", "Strength", "Trust"],
-        "interests": ["birth", "families", "new life", "support", "care", "people"],
-        "description": "Support people through pregnancy and birth — bring new life into the world safely.",
-        "skills_to_develop": ["Antenatal Care", "Labour Support", "Postnatal Care"],
-        "routes": ["BTEC Health & Social", "T Level Health", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Occupational Therapist",
-        "category": "Healthcare",
-        "subjects": ["Psychology", "Biology", "Health & Social Care"],
-        "skills": ["Creativity", "Empathy", "Problem Solving", "Patience"],
-        "interests": ["independence", "everyday life", "ability", "helping people", "adaptation"],
-        "description": "Help people live their best lives — overcome barriers to do everyday things.",
-        "skills_to_develop": ["Rehabilitation", "Adaptation", "Person-Centred Care"],
-        "routes": ["BTEC Health & Social", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Social Worker",
-        "category": "Community",
-        "subjects": ["Sociology", "Psychology", "English", "Health & Social Care"],
-        "skills": ["Empathy", "Resilience", "Advocacy", "Communication", "Bravery"],
-        "interests": ["people", "families", "support", "change", "justice", "community"],
-        "description": "Stand up for vulnerable people — support families and protect those in need.",
-        "skills_to_develop": ["Safeguarding", "Legislation", "Person-Centred Support"],
-        "routes": ["BTEC Health & Social", "T Level Health", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Dietitian / Nutritionist",
-        "category": "Healthcare",
-        "subjects": ["Biology", "Chemistry", "Health"],
-        "skills": ["Communication", "Empathy", "Organisation", "Science"],
-        "interests": ["food", "health", "wellbeing", "nutrition", "science", "lifestyle"],
-        "description": "Help people understand food and health — eat well and feel their best.",
-        "skills_to_develop": ["Nutritional Science", "Public Health", "Diet Planning"],
-        "routes": ["BTEC Health & Social", "A-Level", "Degree Apprenticeship", "University"]
-    },
 
-    # === ENGINEERING, BUILDING & PRACTICAL ===
-    {
-        "career": "Civil Engineer",
-        "category": "Engineering",
-        "subjects": ["Maths", "Physics", "Design"],
-        "skills": ["Problem Solving", "Design", "Organisation", "Teamwork"],
-        "interests": ["building", "construction", "design", "infrastructure", "cities", "structures"],
-        "description": "Design and build bridges, roads, buildings and infrastructure that shapes our world.",
-        "skills_to_develop": ["Design", "Structural Analysis", "Project Planning"],
-        "routes": ["BTEC Engineering", "T Level Construction", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Mechanical Engineer",
-        "category": "Engineering",
-        "subjects": ["Maths", "Physics", "Design"],
-        "skills": ["Problem Solving", "Creativity", "Hands-on", "Design"],
-        "interests": ["machines", "engines", "mechanics", "invention", "how things work"],
-        "description": "Design and build machines — from cars to robots to spacecraft!",
-        "skills_to_develop": ["Mechanics", "Design", "CAD Software"],
-        "routes": ["BTEC Engineering", "T Level", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Architect",
-        "category": "Engineering",
-        "subjects": ["Art", "Maths", "Design", "Physics"],
-        "skills": ["Creativity", "Design", "Visual Thinking", "Organisation"],
-        "interests": ["design", "buildings", "art", "spaces", "cities", "creativity"],
-        "description": "Design beautiful, functional buildings — combine art with engineering!",
-        "skills_to_develop": ["Design", "CAD", "Architecture History", "Creativity"],
-        "routes": ["BTEC Construction/Art", "A-Level", "University"]
-    },
-    {
-        "career": "Environmental Scientist",
-        "category": "Science",
-        "subjects": ["Biology", "Chemistry", "Geography"],
-        "skills": ["Curiosity", "Research", "Analytical", "Passion"],
-        "interests": ["nature", "planet", "climate", "environment", "sustainability", "wildlife"],
-        "description": "Study and protect our planet — solve climate change and environmental issues.",
-        "skills_to_develop": ["Environmental Science", "Research", "Sustainability"],
-        "routes": ["BTEC Applied Science", "T Level Science", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Quantity Surveyor",
-        "category": "Construction",
-        "subjects": ["Maths", "Business", "Design"],
-        "skills": ["Organisation", "Attention to Detail", "Communication", "Problem Solving"],
-        "interests": ["building", "costs", "projects", "measurement", "planning", "construction"],
-        "description": "Manage the money and contracts for building projects — keep them on budget!",
-        "skills_to_develop": ["Cost Management", "Contracts", "Construction Knowledge"],
-        "routes": ["BTEC Construction", "T Level Construction", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Town Planner",
-        "category": "Construction",
-        "subjects": ["Geography", "Art", "Design", "Sociology"],
-        "skills": ["Vision", "Organisation", "Communication", "Creativity"],
-        "interests": ["cities", "communities", "spaces", "future", "design", "people"],
-        "description": "Design how our towns and cities grow — create better places for people to live.",
-        "skills_to_develop": ["Urban Design", "Community Engagement", "Policy"],
-        "routes": ["BTEC", "A-Level", "Degree Apprenticeship", "University"]
-    },
+# ============================================================
+# GOOGLE FORM ENTRY IDs
+# ============================================================
+#
+# IMPORTANT:
+# These are NOT question names.
+#
+# They look something like:
+#
+# entry.123456789
+# entry.987654321
+#
+# I have left placeholders here because your actual IDs
+# depend on YOUR Google Form.
+#
+# Once you send me your Google Form link + questions,
+# these can be filled in properly.
+# ============================================================
 
-    # === CREATIVE, MEDIA & PERFORMING ===
-    {
-        "career": "Graphic Designer",
-        "category": "Creative",
-        "subjects": ["Art", "Design", "IT"],
-        "skills": ["Creativity", "Visual Thinking", "Attention to Detail", "Imagination"],
-        "interests": ["art", "design", "creativity", "visuals", "branding", "images"],
-        "description": "Create visual concepts — design logos, branding, websites and more.",
-        "skills_to_develop": ["Photoshop", "Illustrator", "Design Principles"],
-        "routes": ["GCSE Pathway", "BTEC Art/Design", "T Level Creative", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Journalist / Reporter",
-        "category": "Media",
-        "subjects": ["English", "History", "Politics", "Media"],
-        "skills": ["Curiosity", "Writing", "Communication", "Confidence", "Research"],
-        "interests": ["news", "stories", "people", "current affairs", "writing", "truth"],
-        "description": "Research and report news — tell the stories that matter.",
-        "skills_to_develop": ["Writing", "Research", "Interviewing", "Reporting"],
-        "routes": ["BTEC Media", "T Level Digital", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Teacher / Lecturer",
-        "category": "Education",
-        "subjects": ["Any Subject", "English"],
-        "skills": ["Communication", "Patience", "Empathy", "Organisation", "Passion"],
-        "interests": ["helping people", "teaching", "learning", "knowledge", "inspiration", "children"],
-        "description": "Inspire the next generation — share your passion and help others grow.",
-        "skills_to_develop": ["Subject Knowledge", "Public Speaking", "Lesson Planning"],
-        "routes": ["BTEC Education", "T Level Education", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Video Editor",
-        "category": "Creative",
-        "subjects": ["Media", "Art", "IT"],
-        "skills": ["Creativity", "Attention to Detail", "Storytelling", "Patience"],
-        "interests": ["video", "film", "editing", "stories", "visuals", "production"],
-        "description": "Edit footage into films, videos and shows — shape the story!",
-        "skills_to_develop": ["Premiere Pro", "DaVinci Resolve", "Storytelling"],
-        "routes": ["GCSE Pathway", "BTEC Media", "T Level Creative", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Copywriter / Content Creator",
-        "category": "Creative",
-        "subjects": ["English", "Media", "Business"],
-        "skills": ["Creativity", "Writing", "Voice", "Adaptability"],
-        "interests": ["writing", "words", "stories", "brands", "social media", "communication"],
-        "description": "Write words that connect — from ads to articles to social media.",
-        "skills_to_develop": ["Writing", "SEO", "Brand Voice"],
-        "routes": ["GCSE Pathway", "BTEC Media", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Interpreter / Translator",
-        "category": "Language",
-        "subjects": ["Modern Languages", "English"],
-        "skills": ["Fluency", "Cultural Awareness", "Listening", "Communication"],
-        "interests": ["languages", "cultures", "connection", "communication", "people", "world"],
-        "description": "Bridge the gap between people — speak and understand the world.",
-        "skills_to_develop": ["Fluency", "Cultural Knowledge", "Simultaneous Speaking"],
-        "routes": ["GCSE Pathway", "A-Level", "Degree Apprenticeship", "University"]
-    },
+FORM_ENTRIES = {
+    "pathway": "entry.PATHWAY_ID",
+    "subjects": "entry.SUBJECTS_ID",
+    "skills": "entry.SKILLS_ID",
+    "interests": "entry.INTERESTS_ID",
+    "industries": "entry.INDUSTRIES_ID",
+    "environment": "entry.ENVIRONMENT_ID",
+    "values": "entry.VALUES_ID",
+    "top_match": "entry.TOP_MATCH_ID",
+    "second_match": "entry.SECOND_MATCH_ID",
+    "third_match": "entry.THIRD_MATCH_ID",
+    "feedback": "entry.FEEDBACK_ID"
+}
 
-    # === PUBLIC SERVICE, COMMUNITY & PROTECTIVE ===
-    {
-        "career": "Police Officer",
-        "category": "Public Service",
-        "subjects": ["Law", "English", "PE"],
-        "skills": ["Responsibility", "Communication", "Confidence", "Calmness"],
-        "interests": ["helping people", "community", "safety", "justice", "protection", "law"],
-        "description": "Protect the public, uphold the law and keep communities safe.",
-        "skills_to_develop": ["Conflict Resolution", "Law Knowledge", "Communication"],
-        "routes": ["GCSE Pathway", "BTEC Public Services", "T Level", "Apprenticeship", "A-Level", "Degree Apprenticeship"]
-    },
-    {
-        "career": "Firefighter",
-        "category": "Public Service",
-        "subjects": ["PE", "Science", "English"],
-        "skills": ["Courage", "Teamwork", "Physical Strength", "Calmness", "Empathy"],
-        "interests": ["helping people", "emergency", "safety", "protection", "community", "action"],
-        "description": "Save lives and protect communities from fire and other emergencies.",
-        "skills_to_develop": ["Fire Safety", "Rescue", "First Aid", "Teamwork"],
-        "routes": ["GCSE Pathway", "BTEC Public Services", "Apprenticeship", "A-Level", "Degree Apprenticeship"]
-    },
-    {
-        "career": "Civil Servant / Government Official",
-        "category": "Public Service",
-        "subjects": ["Politics", "English", "History"],
-        "skills": ["Organisation", "Responsibility", "Communication", "Integrity"],
-        "interests": ["society", "policy", "government", "public", "rules", "community"],
-        "description": "Work for the government — help make policies and run public services.",
-        "skills_to_develop": ["Policy Making", "Research", "Public Service"],
-        "routes": ["BTEC", "T Level", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Charity Fundraiser / Manager",
-        "category": "Community",
-        "subjects": ["Business", "English", "Sociology"],
-        "skills": ["Empathy", "Communication", "Organisation", "Passion", "Resilience"],
-        "interests": ["helping people", "causes", "community", "change", "giving", "impact"],
-        "description": "Raise money and awareness for good causes — make a real difference.",
-        "skills_to_develop": ["Campaigning", "Community Engagement", "Project Management"],
-        "routes": ["GCSE Pathway", "BTEC", "T Level", "A-Level", "Degree Apprenticeship", "University"]
-    },
-    {
-        "career": "Project Manager",
-        "category": "Business",
-        "subjects": ["Business", "Any Subject"],
-        "skills": ["Leadership", "Organisation", "Communication", "Problem Solving", "Planning"],
-        "interests": ["planning", "leading", "teams", "goals", "organisation", "delivery"],
-        "description": "Lead teams and deliver big projects — make things happen on time and on budget.",
-        "skills_to_develop": ["Planning", "Leadership", "Agile", "Organisation"],
-        "routes": ["BTEC", "T Level", "A-Level", "Degree Apprenticeship", "University"]
-    }
-]
 
-# ------------------------------
-# MAIN APP — FOR EVERY STUDENT!
-# ------------------------------
-st.title("🎯 PathPilot — Find YOUR Perfect Path")
-st.subheader("For EVERYONE — GCSE • BTEC • T Level • A-Level • Apprenticeship • University — there's a path for YOU! 💛🌍")
-st.markdown("---")
+# ============================================================
+# CUSTOM CSS
+# ============================================================
 
-st.header("👤 Tell us about yourself")
-name = st.text_input("What's your name?")
+st.markdown("""
+<style>
 
-st.subheader("🎓 What qualification path are you doing / considering?")
-qual_path = st.selectbox(
-    "Pick the one that fits you!",
+.main {
+    padding-top: 2rem;
+}
+
+.hero {
+    padding: 2.5rem;
+    border-radius: 22px;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.hero p {
+    font-size: 1.15rem;
+}
+
+.career-card {
+    padding: 1.5rem;
+    border-radius: 18px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+    background: white;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+
+.match-score {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.small-text {
+    color: #6b7280;
+}
+
+.route-box {
+    padding: 1rem;
+    border-radius: 12px;
+    background: #f5f7ff;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+
+# ============================================================
+# HERO
+# ============================================================
+
+st.markdown("""
+<div class="hero">
+
+<h1>🚀 PathPilot</h1>
+
+<p>
+Discover pathways and careers that fit YOU.
+</p>
+
+<p>
+Explore careers based on your subjects, skills,
+interests and goals.
+</p>
+
+</div>
+""", unsafe_allow_html=True)
+
+
+# ============================================================
+# 1. PATHWAY
+# ============================================================
+
+st.subheader("1️⃣ What pathway are you thinking about?")
+
+pathway = st.multiselect(
+    "Select all that apply:",
     [
-        "GCSE Pathway",
-        "BTEC (any level)",
+        "A Levels",
         "T Level",
-        "A-Level",
+        "BTEC (Level 3 / Extended Diploma)",
+        "CTEC",
+        "OCR Cambridge Technical",
+        "International Baccalaureate (IB)",
         "Degree Apprenticeship",
         "University",
-        "Exploring all options — not sure yet!"
+        "Higher Apprenticeship (Level 4/5)",
+        "Advanced Apprenticeship (Level 3)",
+        "Intermediate Apprenticeship (Level 2)",
+        "School Leaver Programme",
+        "Access to HE",
+        "Not sure yet"
     ]
 )
 
-st.subheader("📚 What subjects do you enjoy / best at?")
-subjects_input = st.text_area("Type your subjects — one per line:", 
-                              placeholder="Computer Science\nMaths\nEnglish\nHealth & Social Care\nArt\nBusiness\nIT\nPsychology")
-user_subjects = [s.strip().lower() for s in subjects_input.split("\n") if s.strip()]
 
-st.subheader("💪 What are your best skills?")
-skills_input = st.text_area("What are you good at? — one per line:", 
-                           placeholder="Problem Solving\nCreativity\nCommunication\nHelping people\nOrganisation")
-user_skills = [s.strip().lower() for s in skills_input.split("\n") if s.strip()]
+# ============================================================
+# 2. SUBJECTS
+# ============================================================
 
-st.subheader("💡 What interests you most?")
-interests_input = st.text_area("What do you love doing? — one per line:", 
-                              placeholder="Technology\nHelping people\nBusiness\nArt & Design\nScience\nLaw")
-user_interests = [s.strip().lower() for s in interests_input.split("\n") if s.strip()]
+st.subheader("2️⃣ What subjects are you studying right now?")
 
-# ------------------------------
-# CALCULATE MATCHES
-# ------------------------------
-if st.button("🚀 Find My Perfect Career!", type="primary"):
-    if not name:
-        st.error("Please enter your name!")
-    else:
-        st.markdown("---")
-        st.header(f"📊 Hi {name} — Your Top Career Matches!")
-        st.info(f"🎓 Path selected: **{qual_path}** — showing careers that fit YOUR route! 💛")
-        
-        user_path = qual_path
-        if "Exploring" in qual_path:
-            user_path = None
-        
+subjects = st.multiselect(
+    "Tick all that apply:",
+    [
+        "Maths",
+        "English Language",
+        "English Literature",
+        "Biology",
+        "Chemistry",
+        "Physics",
+        "Computer Science",
+        "IT / Digital Technology",
+        "Economics",
+        "Business Studies",
+        "Psychology",
+        "Sociology",
+        "History",
+        "Geography",
+        "French / Spanish / Other Language",
+        "Art & Design",
+        "Graphic Design",
+        "Engineering",
+        "Health & Social Care",
+        "Law",
+        "Media Studies",
+        "PE / Sports Science",
+        "Music / Music Technology",
+        "Drama / Theatre",
+        "Philosophy & Ethics",
+        "Other"
+    ]
+)
+
+
+# ============================================================
+# 3. SKILLS
+# ============================================================
+
+st.subheader("3️⃣ What are your best skills?")
+
+st.caption(
+    "Examples: problem-solving, coding, teamwork, public speaking, "
+    "leadership, creativity, data analysis, writing, planning, "
+    "research, empathy, negotiation or time management."
+)
+
+skills = st.text_area(
+    "Type your best skills:",
+    placeholder="e.g. coding, problem-solving, teamwork..."
+)
+
+
+# ============================================================
+# 4. INTERESTS
+# ============================================================
+
+st.subheader("4️⃣ What do you enjoy doing most?")
+
+interests = st.multiselect(
+    "Pick all that match:",
+    [
+        "Coding, programming & software development",
+        "Art, design, drawing & creative work",
+        "Sports, fitness, training & outdoor activities",
+        "Gaming, esports & streaming",
+        "Writing, journalism, blogging & content creation",
+        "Science experiments, research & discovering new things",
+        "Business ideas, entrepreneurship & starting projects",
+        "Helping people, mentoring, charity & community work",
+        "Teaching, explaining, tutoring & supporting others",
+        "Building, making, fixing & hands-on creating",
+        "Travelling, exploring & learning about different cultures",
+        "Music, performing, singing, instruments & entertainment",
+        "Social media, content creation, marketing & trends",
+        "Working with numbers, data, maths & analysing facts",
+        "Nature, animals, wildlife & the environment",
+        "Debating, politics, current affairs & discussing ideas",
+        "Cooking, baking, food & hospitality",
+        "Fashion, beauty, styling & lifestyle",
+        "Photography, videography & visual storytelling",
+        "Planning events, organising & bringing people together",
+        "Languages, learning about other countries & translating",
+        "Reading, learning & discovering new things",
+        "Not sure yet"
+    ]
+)
+
+
+# ============================================================
+# 5. INDUSTRIES
+# ============================================================
+
+st.subheader("5️⃣ Which industries interest you the most?")
+
+industries = st.multiselect(
+    "Pick multiple:",
+    [
+        "Technology, Software Development & IT",
+        "Engineering — Mechanical, Electrical, Civil & Aerospace",
+        "Healthcare, Medicine, Nursing & Mental Health",
+        "Business, Finance, Accounting & Banking",
+        "Creative, Media, Design, Film & Journalism",
+        "Education, Teaching & Training",
+        "Law, Legal Services, Politics & Government",
+        "Science, Research, Biotech & Pharmaceuticals",
+        "Sports, Fitness, Leisure & Nutrition",
+        "Public Services, Police, Fire, Military & Civil Service",
+        "Environment, Sustainability, Green Energy & Conservation",
+        "Hospitality, Events, Tourism & Travel",
+        "Marketing, Advertising, PR & Communications",
+        "Construction, Architecture, Surveying & Property",
+        "Transport, Logistics, Aviation & Supply Chain",
+        "Fashion, Retail, Merchandising & Consumer Brands",
+        "Digital Media, Gaming, Animation & VFX",
+        "Charity, Non-Profit & Social Impact",
+        "Manufacturing, Production & Industrial Design",
+        "Human Resources, Recruitment & People Management",
+        "Publishing, Literature & Libraries",
+        "Performing Arts, Music Production & Entertainment",
+        "Agriculture, Food Science & Veterinary",
+        "Energy, Oil & Gas / Renewables",
+        "Law Enforcement, Security & Intelligence",
+        "Not sure yet"
+    ]
+)
+
+
+# ============================================================
+# 6. WORK ENVIRONMENT
+# ============================================================
+
+st.subheader("6️⃣ What kind of work environment do you prefer?")
+
+environment = st.multiselect(
+    "Select all that fit:",
+    [
+        "Professional office setting",
+        "Fast-paced & busy",
+        "Creative / relaxed vibe",
+        "Working outdoors / on-site",
+        "Lab / research facility",
+        "Remote / from home",
+        "Team-focused",
+        "Independent working",
+        "Customer-facing",
+        "Not sure yet"
+    ]
+)
+
+
+# ============================================================
+# 7. VALUES
+# ============================================================
+
+st.subheader("7️⃣ What matters most to you?")
+
+values = st.multiselect(
+    "Pick your top priorities:",
+    [
+        "High earning potential",
+        "Job security",
+        "Creative freedom",
+        "Helping people",
+        "Fast career progression",
+        "Good work-life balance",
+        "Learning new skills",
+        "Making an impact",
+        "Working with people",
+        "Not sure yet"
+    ]
+)
+
+
+# ============================================================
+# CAREER DATABASE
+# ============================================================
+
+CAREERS = [
+
+    {
+        "name": "Software Engineer",
+
+        "levels": ["level3", "degree"],
+
+        "industries": [
+            "Technology, Software Development & IT"
+        ],
+
+        "subjects": [
+            "Computer Science",
+            "Maths",
+            "Physics",
+            "IT / Digital Technology"
+        ],
+
+        "interests": [
+            "Coding, programming & software development",
+            "Gaming, esports & streaming",
+            "Building, making, fixing & hands-on creating",
+            "Working with numbers, data, maths & analysing facts"
+        ],
+
+        "keywords": [
+            "coding",
+            "programming",
+            "problem-solving",
+            "logical",
+            "python",
+            "software",
+            "technology",
+            "data",
+            "algorithms",
+            "building"
+        ],
+
+        "environments": [
+            "Professional office setting",
+            "Fast-paced & busy",
+            "Remote / from home",
+            "Team-focused",
+            "Independent working"
+        ],
+
+        "values": [
+            "High earning potential",
+            "Fast career progression",
+            "Learning new skills",
+            "Creative freedom",
+            "Good work-life balance"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship",
+            "Higher Apprenticeship (Level 4/5)"
+        ],
+
+        "develop": [
+            "Python",
+            "Git & GitHub",
+            "Algorithms",
+            "Data structures",
+            "Software development"
+        ]
+    },
+
+    {
+        "name": "Data Scientist",
+
+        "levels": ["level3", "degree"],
+
+        "industries": [
+            "Technology, Software Development & IT",
+            "Science, Research, Biotech & Pharmaceuticals",
+            "Business, Finance, Accounting & Banking"
+        ],
+
+        "subjects": [
+            "Maths",
+            "Computer Science",
+            "Economics",
+            "Physics"
+        ],
+
+        "interests": [
+            "Working with numbers, data, maths & analysing facts",
+            "Science experiments, research & discovering new things",
+            "Coding, programming & software development",
+            "Reading, learning & discovering new things"
+        ],
+
+        "keywords": [
+            "data",
+            "maths",
+            "statistics",
+            "analysis",
+            "research",
+            "coding",
+            "python",
+            "problem-solving",
+            "numbers"
+        ],
+
+        "environments": [
+            "Professional office setting",
+            "Lab / research facility",
+            "Remote / from home",
+            "Independent working",
+            "Team-focused"
+        ],
+
+        "values": [
+            "High earning potential",
+            "Learning new skills",
+            "Making an impact",
+            "Fast career progression"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship"
+        ],
+
+        "develop": [
+            "Python",
+            "Statistics",
+            "SQL",
+            "Data visualisation",
+            "Machine learning"
+        ]
+    },
+
+    {
+        "name": "Cyber Security Analyst",
+
+        "levels": ["level3", "degree"],
+
+        "industries": [
+            "Technology, Software Development & IT",
+            "Law Enforcement, Security & Intelligence"
+        ],
+
+        "subjects": [
+            "Computer Science",
+            "Maths",
+            "IT / Digital Technology",
+            "Physics"
+        ],
+
+        "interests": [
+            "Coding, programming & software development",
+            "Gaming, esports & streaming",
+            "Debating, politics, current affairs & discussing ideas",
+            "Reading, learning & discovering new things"
+        ],
+
+        "keywords": [
+            "coding",
+            "security",
+            "technology",
+            "problem-solving",
+            "investigation",
+            "research",
+            "logical",
+            "computers"
+        ],
+
+        "environments": [
+            "Professional office setting",
+            "Fast-paced & busy",
+            "Remote / from home",
+            "Team-focused",
+            "Independent working"
+        ],
+
+        "values": [
+            "High earning potential",
+            "Job security",
+            "Learning new skills",
+            "Making an impact",
+            "Fast career progression"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship",
+            "Higher Apprenticeship (Level 4/5)"
+        ],
+
+        "develop": [
+            "Networking",
+            "Python",
+            "Cybersecurity fundamentals",
+            "Linux",
+            "Threat analysis"
+        ]
+    },
+
+    {
+        "name": "Accountant",
+
+        "levels": ["level3", "degree"],
+
+        "industries": [
+            "Business, Finance, Accounting & Banking"
+        ],
+
+        "subjects": [
+            "Maths",
+            "Economics",
+            "Business Studies"
+        ],
+
+        "interests": [
+            "Working with numbers, data, maths & analysing facts",
+            "Business ideas, entrepreneurship & starting projects",
+            "Reading, learning & discovering new things"
+        ],
+
+        "keywords": [
+            "numbers",
+            "maths",
+            "finance",
+            "analysis",
+            "organisation",
+            "detail",
+            "business",
+            "economics"
+        ],
+
+        "environments": [
+            "Professional office setting",
+            "Fast-paced & busy",
+            "Team-focused",
+            "Independent working"
+        ],
+
+        "values": [
+            "High earning potential",
+            "Job security",
+            "Fast career progression",
+            "Learning new skills",
+            "Good work-life balance"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship",
+            "School Leaver Programme",
+            "Higher Apprenticeship (Level 4/5)"
+        ],
+
+        "develop": [
+            "Financial analysis",
+            "Excel",
+            "Accounting principles",
+            "Communication",
+            "Attention to detail"
+        ]
+    },
+
+    {
+        "name": "Business Analyst",
+
+        "levels": ["level3", "degree"],
+
+        "industries": [
+            "Business, Finance, Accounting & Banking",
+            "Technology, Software Development & IT"
+        ],
+
+        "subjects": [
+            "Maths",
+            "Economics",
+            "Business Studies",
+            "Computer Science"
+        ],
+
+        "interests": [
+            "Business ideas, entrepreneurship & starting projects",
+            "Working with numbers, data, maths & analysing facts",
+            "Planning events, organising & bringing people together",
+            "Coding, programming & software development"
+        ],
+
+        "keywords": [
+            "analysis",
+            "business",
+            "problem-solving",
+            "data",
+            "organisation",
+            "communication",
+            "research",
+            "planning"
+        ],
+
+        "environments": [
+            "Professional office setting",
+            "Team-focused",
+            "Fast-paced & busy",
+            "Independent working"
+        ],
+
+        "values": [
+            "High earning potential",
+            "Fast career progression",
+            "Learning new skills",
+            "Working with people",
+            "Good work-life balance"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship",
+            "Higher Apprenticeship (Level 4/5)"
+        ],
+
+        "develop": [
+            "Excel",
+            "Data analysis",
+            "Presentation skills",
+            "Business strategy",
+            "Stakeholder communication"
+        ]
+    },
+
+    {
+        "name": "Civil Engineer",
+
+        "levels": ["level3", "degree"],
+
+        "industries": [
+            "Engineering — Mechanical, Electrical, Civil & Aerospace",
+            "Construction, Architecture, Surveying & Property"
+        ],
+
+        "subjects": [
+            "Maths",
+            "Physics",
+            "Engineering",
+            "Geography"
+        ],
+
+        "interests": [
+            "Building, making, fixing & hands-on creating",
+            "Working with numbers, data, maths & analysing facts",
+            "Science experiments, research & discovering new things"
+        ],
+
+        "keywords": [
+            "maths",
+            "engineering",
+            "building",
+            "design",
+            "problem-solving",
+            "physics",
+            "construction"
+        ],
+
+        "environments": [
+            "Working outdoors / on-site",
+            "Professional office setting",
+            "Team-focused",
+            "Fast-paced & busy"
+        ],
+
+        "values": [
+            "High earning potential",
+            "Job security",
+            "Making an impact",
+            "Learning new skills"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship",
+            "Higher Apprenticeship (Level 4/5)"
+        ],
+
+        "develop": [
+            "CAD",
+            "Engineering mathematics",
+            "Project management",
+            "Structural principles",
+            "Technical drawing"
+        ]
+    },
+
+    {
+        "name": "Doctor / Medical Practitioner",
+
+        "levels": ["degree"],
+
+        "industries": [
+            "Healthcare, Medicine, Nursing & Mental Health"
+        ],
+
+        "subjects": [
+            "Biology",
+            "Chemistry",
+            "Maths",
+            "Physics"
+        ],
+
+        "interests": [
+            "Science experiments, research & discovering new things",
+            "Helping people, mentoring, charity & community work",
+            "Reading, learning & discovering new things"
+        ],
+
+        "keywords": [
+            "biology",
+            "science",
+            "research",
+            "helping",
+            "people",
+            "communication",
+            "problem-solving"
+        ],
+
+        "environments": [
+            "Lab / research facility",
+            "Fast-paced & busy",
+            "Customer-facing",
+            "Team-focused"
+        ],
+
+        "values": [
+            "Helping people",
+            "Making an impact",
+            "Job security",
+            "Learning new skills",
+            "Working with people"
+        ],
+
+        "routes": [
+            "University"
+        ],
+
+        "develop": [
+            "Biology",
+            "Chemistry",
+            "Communication",
+            "Critical thinking",
+            "Research"
+        ]
+    },
+
+    {
+        "name": "Nurse / Midwife",
+
+        "levels": ["level3", "degree"],
+
+        "industries": [
+            "Healthcare, Medicine, Nursing & Mental Health"
+        ],
+
+        "subjects": [
+            "Biology",
+            "Health & Social Care",
+            "Psychology",
+            "Chemistry"
+        ],
+
+        "interests": [
+            "Helping people, mentoring, charity & community work",
+            "Teaching, explaining, tutoring & supporting others",
+            "Science experiments, research & discovering new things"
+        ],
+
+        "keywords": [
+            "helping",
+            "people",
+            "biology",
+            "science",
+            "communication",
+            "empathy",
+            "care"
+        ],
+
+        "environments": [
+            "Fast-paced & busy",
+            "Customer-facing",
+            "Team-focused"
+        ],
+
+        "values": [
+            "Helping people",
+            "Making an impact",
+            "Job security",
+            "Working with people"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship"
+        ],
+
+        "develop": [
+            "Communication",
+            "Biology",
+            "Teamwork",
+            "Empathy",
+            "Decision-making"
+        ]
+    },
+
+    {
+        "name": "Graphic Designer",
+
+        "levels": ["level2", "level3", "degree"],
+
+        "industries": [
+            "Creative, Media, Design, Film & Journalism",
+            "Marketing, Advertising, PR & Communications"
+        ],
+
+        "subjects": [
+            "Art & Design",
+            "Graphic Design",
+            "Media Studies",
+            "Computer Science"
+        ],
+
+        "interests": [
+            "Art, design, drawing & creative work",
+            "Photography, videography & visual storytelling",
+            "Social media, content creation, marketing & trends",
+            "Fashion, beauty, styling & lifestyle"
+        ],
+
+        "keywords": [
+            "design",
+            "creative",
+            "art",
+            "visual",
+            "photoshop",
+            "branding",
+            "content"
+        ],
+
+        "environments": [
+            "Creative / relaxed vibe",
+            "Remote / from home",
+            "Team-focused",
+            "Independent working"
+        ],
+
+        "values": [
+            "Creative freedom",
+            "Learning new skills",
+            "Good work-life balance",
+            "Making an impact"
+        ],
+
+        "routes": [
+            "University",
+            "College / Level 3 qualification",
+            "Apprenticeship"
+        ],
+
+        "develop": [
+            "Adobe Creative Suite",
+            "Typography",
+            "Branding",
+            "UI design",
+            "Visual communication"
+        ]
+    },
+
+    {
+        "name": "UX / UI Designer",
+
+        "levels": ["level3", "degree"],
+
+        "industries": [
+            "Technology, Software Development & IT",
+            "Creative, Media, Design, Film & Journalism"
+        ],
+
+        "subjects": [
+            "Art & Design",
+            "Graphic Design",
+            "Computer Science",
+            "Media Studies"
+        ],
+
+        "interests": [
+            "Art, design, drawing & creative work",
+            "Coding, programming & software development",
+            "Photography, videography & visual storytelling",
+            "Building, making, fixing & hands-on creating"
+        ],
+
+        "keywords": [
+            "design",
+            "creative",
+            "technology",
+            "user",
+            "problem-solving",
+            "visual",
+            "research"
+        ],
+
+        "environments": [
+            "Creative / relaxed vibe",
+            "Professional office setting",
+            "Remote / from home",
+            "Team-focused"
+        ],
+
+        "values": [
+            "Creative freedom",
+            "Learning new skills",
+            "Good work-life balance",
+            "Making an impact"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship",
+            "Higher Apprenticeship (Level 4/5)"
+        ],
+
+        "develop": [
+            "Figma",
+            "User research",
+            "Wireframing",
+            "Prototyping",
+            "Design thinking"
+        ]
+    },
+
+    {
+        "name": "Marketing Executive",
+
+        "levels": ["level3", "degree"],
+
+        "industries": [
+            "Marketing, Advertising, PR & Communications",
+            "Creative, Media, Design, Film & Journalism"
+        ],
+
+        "subjects": [
+            "Business Studies",
+            "Media Studies",
+            "English Language",
+            "Art & Design"
+        ],
+
+        "interests": [
+            "Social media, content creation, marketing & trends",
+            "Writing, journalism, blogging & content creation",
+            "Business ideas, entrepreneurship & starting projects",
+            "Photography, videography & visual storytelling"
+        ],
+
+        "keywords": [
+            "creative",
+            "marketing",
+            "social",
+            "media",
+            "writing",
+            "business",
+            "communication"
+        ],
+
+        "environments": [
+            "Creative / relaxed vibe",
+            "Professional office setting",
+            "Fast-paced & busy",
+            "Team-focused",
+            "Customer-facing"
+        ],
+
+        "values": [
+            "Creative freedom",
+            "Fast career progression",
+            "Working with people",
+            "Making an impact",
+            "Learning new skills"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship",
+            "Higher Apprenticeship (Level 4/5)"
+        ],
+
+        "develop": [
+            "Social media",
+            "Copywriting",
+            "Analytics",
+            "Campaign planning",
+            "Communication"
+        ]
+    },
+
+    {
+        "name": "Lawyer / Solicitor",
+
+        "levels": ["degree"],
+
+        "industries": [
+            "Law, Legal Services, Politics & Government"
+        ],
+
+        "subjects": [
+            "English Language",
+            "English Literature",
+            "History",
+            "Law",
+            "Philosophy & Ethics"
+        ],
+
+        "interests": [
+            "Debating, politics, current affairs & discussing ideas",
+            "Writing, journalism, blogging & content creation",
+            "Reading, learning & discovering new things"
+        ],
+
+        "keywords": [
+            "debating",
+            "research",
+            "writing",
+            "argument",
+            "communication",
+            "analysis",
+            "law"
+        ],
+
+        "environments": [
+            "Professional office setting",
+            "Fast-paced & busy",
+            "Team-focused",
+            "Independent working",
+            "Customer-facing"
+        ],
+
+        "values": [
+            "High earning potential",
+            "Fast career progression",
+            "Making an impact",
+            "Working with people",
+            "Learning new skills"
+        ],
+
+        "routes": [
+            "University",
+            "Solicitor Apprenticeship"
+        ],
+
+        "develop": [
+            "Legal research",
+            "Writing",
+            "Public speaking",
+            "Critical thinking",
+            "Negotiation"
+        ]
+    },
+
+    {
+        "name": "Teacher / Lecturer",
+
+        "levels": ["level3", "degree"],
+
+        "industries": [
+            "Education, Teaching & Training"
+        ],
+
+        "subjects": [
+            "Maths",
+            "English Language",
+            "English Literature",
+            "Biology",
+            "Chemistry",
+            "Physics",
+            "Computer Science",
+            "History",
+            "Geography",
+            "French / Spanish / Other Language"
+        ],
+
+        "interests": [
+            "Teaching, explaining, tutoring & supporting others",
+            "Helping people, mentoring, charity & community work",
+            "Reading, learning & discovering new things"
+        ],
+
+        "keywords": [
+            "teaching",
+            "communication",
+            "helping",
+            "leadership",
+            "patience",
+            "explaining",
+            "people"
+        ],
+
+        "environments": [
+            "Customer-facing",
+            "Team-focused",
+            "Professional office setting",
+            "Fast-paced & busy"
+        ],
+
+        "values": [
+            "Helping people",
+            "Making an impact",
+            "Job security",
+            "Working with people",
+            "Learning new skills"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship",
+            "Teacher Training"
+        ],
+
+        "develop": [
+            "Public speaking",
+            "Lesson planning",
+            "Communication",
+            "Leadership",
+            "Subject knowledge"
+        ]
+    },
+
+    {
+        "name": "Project Manager",
+
+        "levels": ["level3", "degree"],
+
+        "industries": [
+            "Business, Finance, Accounting & Banking",
+            "Construction, Architecture, Surveying & Property",
+            "Technology, Software Development & IT"
+        ],
+
+        "subjects": [
+            "Business Studies",
+            "Economics",
+            "Maths",
+            "Computer Science"
+        ],
+
+        "interests": [
+            "Planning events, organising & bringing people together",
+            "Business ideas, entrepreneurship & starting projects",
+            "Building, making, fixing & hands-on creating"
+        ],
+
+        "keywords": [
+            "planning",
+            "organisation",
+            "leadership",
+            "teamwork",
+            "communication",
+            "project",
+            "problem-solving"
+        ],
+
+        "environments": [
+            "Professional office setting",
+            "Fast-paced & busy",
+            "Team-focused",
+            "Customer-facing"
+        ],
+
+        "values": [
+            "Fast career progression",
+            "Working with people",
+            "High earning potential",
+            "Making an impact",
+            "Learning new skills"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship",
+            "Higher Apprenticeship (Level 4/5)"
+        ],
+
+        "develop": [
+            "Leadership",
+            "Planning",
+            "Communication",
+            "Risk management",
+            "Organisation"
+        ]
+    },
+
+    {
+        "name": "Psychologist",
+
+        "levels": ["degree"],
+
+        "industries": [
+            "Healthcare, Medicine, Nursing & Mental Health",
+            "Education, Teaching & Training"
+        ],
+
+        "subjects": [
+            "Psychology",
+            "Biology",
+            "Maths",
+            "English Language"
+        ],
+
+        "interests": [
+            "Helping people, mentoring, charity & community work",
+            "Science experiments, research & discovering new things",
+            "Teaching, explaining, tutoring & supporting others"
+        ],
+
+        "keywords": [
+            "psychology",
+            "research",
+            "people",
+            "helping",
+            "communication",
+            "empathy",
+            "analysis"
+        ],
+
+        "environments": [
+            "Customer-facing",
+            "Professional office setting",
+            "Lab / research facility",
+            "Team-focused"
+        ],
+
+        "values": [
+            "Helping people",
+            "Making an impact",
+            "Learning new skills",
+            "Working with people"
+        ],
+
+        "routes": [
+            "University"
+        ],
+
+        "develop": [
+            "Research",
+            "Statistics",
+            "Communication",
+            "Critical thinking",
+            "Psychology"
+        ]
+    },
+
+    {
+        "name": "Digital Marketer / Social Media Manager",
+
+        "levels": ["level2", "level3", "degree"],
+
+        "industries": [
+            "Marketing, Advertising, PR & Communications",
+            "Creative, Media, Design, Film & Journalism"
+        ],
+
+        "subjects": [
+            "Media Studies",
+            "Business Studies",
+            "English Language",
+            "Art & Design"
+        ],
+
+        "interests": [
+            "Social media, content creation, marketing & trends",
+            "Writing, journalism, blogging & content creation",
+            "Photography, videography & visual storytelling",
+            "Business ideas, entrepreneurship & starting projects"
+        ],
+
+        "keywords": [
+            "social",
+            "media",
+            "content",
+            "marketing",
+            "creative",
+            "writing",
+            "communication"
+        ],
+
+        "environments": [
+            "Creative / relaxed vibe",
+            "Remote / from home",
+            "Team-focused",
+            "Fast-paced & busy"
+        ],
+
+        "values": [
+            "Creative freedom",
+            "Good work-life balance",
+            "Fast career progression",
+            "Learning new skills"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship",
+            "Advanced Apprenticeship (Level 3)"
+        ],
+
+        "develop": [
+            "Social media strategy",
+            "Content creation",
+            "Analytics",
+            "Copywriting",
+            "Marketing"
+        ]
+    },
+
+    {
+        "name": "Architect",
+
+        "levels": ["degree"],
+
+        "industries": [
+            "Construction, Architecture, Surveying & Property",
+            "Creative, Media, Design, Film & Journalism"
+        ],
+
+        "subjects": [
+            "Maths",
+            "Art & Design",
+            "Graphic Design",
+            "Physics",
+            "Engineering"
+        ],
+
+        "interests": [
+            "Art, design, drawing & creative work",
+            "Building, making, fixing & hands-on creating",
+            "Photography, videography & visual storytelling"
+        ],
+
+        "keywords": [
+            "design",
+            "art",
+            "building",
+            "maths",
+            "creative",
+            "architecture",
+            "drawing"
+        ],
+
+        "environments": [
+            "Creative / relaxed vibe",
+            "Professional office setting",
+            "Working outdoors / on-site",
+            "Team-focused"
+        ],
+
+        "values": [
+            "Creative freedom",
+            "Making an impact",
+            "Learning new skills",
+            "Working with people"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship"
+        ],
+
+        "develop": [
+            "CAD",
+            "Technical drawing",
+            "Design",
+            "Mathematics",
+            "Project management"
+        ]
+    },
+
+    {
+        "name": "Environmental Scientist",
+
+        "levels": ["level3", "degree"],
+
+        "industries": [
+            "Environment, Sustainability, Green Energy & Conservation",
+            "Science, Research, Biotech & Pharmaceuticals"
+        ],
+
+        "subjects": [
+            "Biology",
+            "Chemistry",
+            "Geography",
+            "Physics"
+        ],
+
+        "interests": [
+            "Nature, animals, wildlife & the environment",
+            "Science experiments, research & discovering new things",
+            "Reading, learning & discovering new things"
+        ],
+
+        "keywords": [
+            "science",
+            "environment",
+            "nature",
+            "research",
+            "biology",
+            "analysis",
+            "sustainability"
+        ],
+
+        "environments": [
+            "Lab / research facility",
+            "Working outdoors / on-site",
+            "Independent working",
+            "Team-focused"
+        ],
+
+        "values": [
+            "Making an impact",
+            "Learning new skills",
+            "Job security"
+        ],
+
+        "routes": [
+            "University",
+            "Degree Apprenticeship"
+        ],
+
+        "develop": [
+            "Research",
+            "Data analysis",
+            "Environmental science",
+            "Fieldwork",
+            "Scientific writing"
+        ]
+    },
+
+    {
+        "name": "Sports Coach",
+
+        "levels": ["level2", "level3"],
+
+        "industries": [
+            "Sports, Fitness, Leisure & Nutrition"
+        ],
+
+        "subjects": [
+            "PE / Sports Science",
+            "Biology",
+            "Psychology"
+        ],
+
+        "interests": [
+            "Sports, fitness, training & outdoor activities",
+            "Teaching, explaining, tutoring & supporting others",
+            "Helping people, mentoring, charity & community work"
+        ],
+
+        "keywords": [
+            "sports",
+            "fitness",
+            "leadership",
+            "teamwork",
+            "motivation",
+            "helping",
+            "communication"
+        ],
+
+        "environments": [
+            "Working outdoors / on-site",
+            "Customer-facing",
+            "Team-focused",
+            "Fast-paced & busy"
+        ],
+
+        "values": [
+            "Helping people",
+            "Making an impact",
+            "Working with people",
+            "Job security"
+        ],
+
+        "routes": [
+            "College / Level 3 qualification",
+            "Advanced Apprenticeship (Level 3)",
+            "University"
+        ],
+
+        "develop": [
+            "Leadership",
+            "Coaching",
+            "Communication",
+            "Sports science",
+            "Motivation"
+        ]
+    }
+]
+
+
+# ============================================================
+# PATHWAY LEVEL
+# ============================================================
+
+DEGREE_LEVELS = {
+    "University",
+    "Degree Apprenticeship"
+}
+
+LEVEL3_PATHWAYS = {
+    "A Levels",
+    "T Level",
+    "BTEC (Level 3 / Extended Diploma)",
+    "CTEC",
+    "OCR Cambridge Technical",
+    "International Baccalaureate (IB)",
+    "Advanced Apprenticeship (Level 3)",
+    "School Leaver Programme",
+    "Access to HE",
+    "Higher Apprenticeship (Level 4/5)"
+}
+
+LEVEL2_PATHWAYS = {
+    "Intermediate Apprenticeship (Level 2)"
+}
+
+
+def determine_user_level(selected_pathways):
+
+    if not selected_pathways:
+        return "unknown"
+
+    if "Not sure yet" in selected_pathways:
+        return "unknown"
+
+    if any(x in DEGREE_LEVELS for x in selected_pathways):
+        return "degree"
+
+    if any(x in LEVEL3_PATHWAYS for x in selected_pathways):
+        return "level3"
+
+    if any(x in LEVEL2_PATHWAYS for x in selected_pathways):
+        return "level2"
+
+    return "unknown"
+
+
+# ============================================================
+# MATCHING ALGORITHM
+# ============================================================
+
+def calculate_match(role, user):
+
+    score = 0
+    max_score = 0
+    reasons = []
+
+    # --------------------------------------------------------
+    # PATHWAY
+    # --------------------------------------------------------
+
+    max_score += 15
+
+    if user["level"] == "unknown":
+        score += 15
+
+    elif user["level"] in role["levels"]:
+        score += 15
+        reasons.append(
+            "your chosen pathway is compatible with this career"
+        )
+
+    # --------------------------------------------------------
+    # INDUSTRY
+    # --------------------------------------------------------
+
+    if user["industries"]:
+
+        max_score += 20
+
+        matches = set(user["industries"]).intersection(
+            role["industries"]
+        )
+
+        if matches:
+
+            score += min(
+                20,
+                len(matches) * 10
+            )
+
+            reasons.append(
+                "your industry interests align with this role"
+            )
+
+    # --------------------------------------------------------
+    # SUBJECTS
+    # --------------------------------------------------------
+
+    if user["subjects"]:
+
+        max_score += 20
+
+        matches = set(user["subjects"]).intersection(
+            role["subjects"]
+        )
+
+        if matches:
+
+            score += min(
+                20,
+                len(matches) * 6
+            )
+
+            reasons.append(
+                "your subjects are relevant to this career"
+            )
+
+    # --------------------------------------------------------
+    # INTERESTS
+    # --------------------------------------------------------
+
+    if user["interests"]:
+
+        max_score += 20
+
+        matches = set(user["interests"]).intersection(
+            role["interests"]
+        )
+
+        if matches:
+
+            score += min(
+                20,
+                len(matches) * 7
+            )
+
+            reasons.append(
+                "your interests strongly overlap with this career"
+            )
+
+    # --------------------------------------------------------
+    # SKILLS
+    # --------------------------------------------------------
+
+    if user["skills"].strip():
+
+        max_score += 15
+
+        skill_text = user["skills"].lower()
+
         matches = []
+
+        for keyword in role["keywords"]:
+
+            if keyword.lower() in skill_text:
+                matches.append(keyword)
+
+        if matches:
+
+            score += min(
+                15,
+                len(matches) * 4
+            )
+
+            reasons.append(
+                "some of your stated skills are relevant to this career"
+            )
+
+    # --------------------------------------------------------
+    # ENVIRONMENT
+    # --------------------------------------------------------
+
+    if user["environment"]:
+
+        max_score += 5
+
+        matches = set(user["environment"]).intersection(
+            role["environments"]
+        )
+
+        if matches:
+            score += 5
+
+    # --------------------------------------------------------
+    # VALUES
+    # --------------------------------------------------------
+
+    if user["values"]:
+
+        max_score += 5
+
+        matches = set(user["values"]).intersection(
+            role["values"]
+        )
+
+        if matches:
+            score += 5
+
+    # --------------------------------------------------------
+    # PERCENTAGE
+    # --------------------------------------------------------
+
+    if max_score == 0:
+        percentage = 0
+    else:
+        percentage = round(
+            (score / max_score) * 100
+        )
+
+    percentage = min(100, percentage)
+
+    return percentage, reasons
+
+
+# ============================================================
+# BUILD GOOGLE FORM URL
+# ============================================================
+
+def create_google_form_url(
+    pathway,
+    subjects,
+    skills,
+    interests,
+    industries,
+    environment,
+    values,
+    results
+):
+
+    if (
+        not GOOGLE_FORM_LINK
+        or GOOGLE_FORM_LINK == "PASTE_YOUR_GOOGLE_FORM_LINK_HERE"
+    ):
+        return None
+
+    top_match = results[0]["role"]["name"] if len(results) > 0 else ""
+    second_match = results[1]["role"]["name"] if len(results) > 1 else ""
+    third_match = results[2]["role"]["name"] if len(results) > 2 else ""
+
+    params = {}
+
+    data = {
+        FORM_ENTRIES["pathway"]: ", ".join(pathway),
+        FORM_ENTRIES["subjects"]: ", ".join(subjects),
+        FORM_ENTRIES["skills"]: skills,
+        FORM_ENTRIES["interests"]: ", ".join(interests),
+        FORM_ENTRIES["industries"]: ", ".join(industries),
+        FORM_ENTRIES["environment"]: ", ".join(environment),
+        FORM_ENTRIES["values"]: ", ".join(values),
+        FORM_ENTRIES["top_match"]: top_match,
+        FORM_ENTRIES["second_match"]: second_match,
+        FORM_ENTRIES["third_match"]: third_match
+    }
+
+    for key, value in data.items():
+
+        if key.startswith("entry.") and not key.endswith("_ID"):
+            params[key] = value
+
+    return GOOGLE_FORM_LINK + "?" + urlencode(params)
+
+
+# ============================================================
+# FIND MATCHES
+# ============================================================
+
+if st.button(
+    "🔍 Find My Career Matches",
+    type="primary",
+    use_container_width=True
+):
+
+    if (
+        not pathway
+        and not subjects
+        and not interests
+        and not industries
+    ):
+
+        st.warning(
+            "Please select at least one pathway, subject, "
+            "interest or industry."
+        )
+
+    else:
+
+        st.markdown("---")
+
+        st.header("✨ Your PathPilot Results")
+
+        st.caption(
+            "Your results are based on the answers you provided. "
+            "They are designed to help you explore options, "
+            "not tell you what career you must choose."
+        )
+
+        user = {
+            "level": determine_user_level(pathway),
+            "subjects": subjects,
+            "skills": skills,
+            "interests": interests,
+            "industries": industries,
+            "environment": environment,
+            "values": values
+        }
+
+        results = []
+
         for career in CAREERS:
-            score = 0
-            max_score = 0
-            
-            # Path filter
-            if user_path:
-                path_matched = False
-                if user_path in career["routes"]:
-                    path_matched = True
-                elif user_path == "BTEC (any level)" and any("BTEC" in r for r in career["routes"]):
-                    path_matched = True
-                elif user_path == "T Level" and any("T Level" in r for r in career["routes"]):
-                    path_matched = True
-                if not path_matched:
-                    continue
-            
-            # Subject match
-            career_subjects = [s.lower() for s in career["subjects"]]
-            subject_matches = len(set(user_subjects) & set(career_subjects))
-            if career_subjects:
-                score += (subject_matches / len(career_subjects)) * 30
-            max_score += 30
-            
-            # Skill match
-            career_skills = [s.lower() for s in career["skills"]]
-            skill_matches = len(set(user_skills) & set(career_skills))
-            if career_skills:
-                score += (skill_matches / len(career_skills)) * 35
-            max_score += 35
-            
-            # Interest match
-            career_interests = [s.lower() for s in career.get("interests", [])]
-            interest_matches = len(set(user_interests) & set(career_interests))
-            if career_interests:
-                score += (interest_matches / len(career_interests)) * 35
-            max_score += 35
-            
-            percentage = round(score) if max_score > 0 else 0
-            matches.append({"career": career, "score": percentage})
-        
-        matches = sorted(matches, key=lambda x: x["score"], reverse=True)
-        
-        if not matches:
-            st.warning("No matches found — try broadening your options! 💛")
-        else:
-            for i, match in enumerate(matches[:5], 1):
-                career = match["career"]
-                score = match["score"]
-                color = "🟢" if score >= 70 else "🟡" if score >= 40 else "🔴"
-                
-                with st.expander(f"{color} #{i} — {career['career']} — {score}% Match", expanded=True):
-                    st.write(f"**Category:** {career['category']}")
-                    st.write(f"**Match Score:** {score}%")
-                    st.write(f"**Description:** {career['description']}")
-                    st.write(f"✅ **Available Paths:** {', '.join(career['routes'])}")
-                    st.write(f"**Key Subjects:** {', '.join(career['subjects'])}")
-                    st.write(f"**Key Skills:** {', '.join(career['skills'])}")
-                    st.write(f"**Skills to Develop:** {', '.join(career['skills_to_develop'])}")
-        
-                #        # === SUBMIT BUTTON ===
+
+            percentage, reasons = calculate_match(
+                career,
+                user
+            )
+
+            results.append({
+                "role": career,
+                "percentage": percentage,
+                "reasons": reasons
+            })
+
+        results.sort(
+            key=lambda x: x["percentage"],
+            reverse=True
+        )
+
+        top_results = results[:5]
+
+        # ====================================================
+        # RESULTS
+        # ====================================================
+
+        st.subheader("🏆 Your Top Career Matches")
+
+        for index, result in enumerate(
+            top_results,
+            start=1
+        ):
+
+            career = result["role"]
+            percentage = result["percentage"]
+            reasons = result["reasons"]
+
+            st.markdown(
+                '<div class="career-card">',
+                unsafe_allow_html=True
+            )
+
+            col1, col2 = st.columns([4, 1])
+
+            with col1:
+
+                if index == 1:
+                    st.markdown(
+                        f"## 🥇 {career['name']}"
+                    )
+
+                elif index == 2:
+                    st.markdown(
+                        f"## 🥈 {career['name']}"
+                    )
+
+                elif index == 3:
+                    st.markdown(
+                        f"## 🥉 {career['name']}"
+                    )
+
+                else:
+                    st.markdown(
+                        f"## {index}. {career['name']}"
+                    )
+
+            with col2:
+
+                st.markdown(
+                    f"""
+                    <div class="match-score">
+                    {percentage}%
+                    </div>
+                    <div class="small-text">
+                    PathPilot Match
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+            st.progress(
+                percentage / 100
+            )
+
+            # ------------------------------------------------
+            # WHY
+            # ------------------------------------------------
+
+            st.markdown("### 💡 Why this could suit you")
+
+            unique_reasons = list(
+                dict.fromkeys(reasons)
+            )
+
+            if unique_reasons:
+
+                for reason in unique_reasons[:4]:
+
+                    st.write(
+                        f"✓ {reason.capitalize()}."
+                    )
+
+            else:
+
+                st.write(
+                    "Your answers show some potential alignment "
+                    "with this career."
+                )
+
+            # ------------------------------------------------
+            # ROUTES
+            # ------------------------------------------------
+
+            st.markdown("### 🎓 Possible routes")
+
+            st.write(
+                " • ".join(
+                    career["routes"]
+                )
+            )
+
+            # ------------------------------------------------
+            # SKILLS
+            # ------------------------------------------------
+
+            st.markdown("### 🛠️ Useful skills to develop")
+
+            st.write(
+                " • ".join(
+                    career["develop"]
+                )
+            )
+
+            st.markdown(
+                "</div>",
+                unsafe_allow_html=True
+            )
+
+
+        # ====================================================
+        # FEEDBACK / DATA COLLECTION
+        # ====================================================
+
         st.markdown("---")
-        st.subheader("📬 Help us improve — submit your results!")
-        st.info("Click below — Form opens in a NEW tab so you keep your results!")
-        
-        if GOOGLE_FORM_LINK != "":
-            st.markdown(f'<a href="{GOOGLE_FORM_LINK}" target="_blank" rel="noopener noreferrer"><button style="background-color:#4CAF50;color:white;padding:12px 24px;border:none;border-radius:8px;font-size:18px;cursor:pointer;width:100%;">📋 Submit My Results</button></a>', unsafe_allow_html=True)
+
+        st.subheader(
+            "📊 Want to help improve PathPilot?"
+        )
+
+        st.write(
+            "You can optionally submit your results anonymously. "
+            "Your responses help us understand which careers "
+            "young people are exploring and improve PathPilot."
+        )
+
+        st.caption(
+            "No name, email address or other unnecessary personal "
+            "information is requested."
+        )
+
+        # ====================================================
+        # GOOGLE FORM
+        # ====================================================
+
+        form_url = create_google_form_url(
+            pathway,
+            subjects,
+            skills,
+            interests,
+            industries,
+            environment,
+            values,
+            top_results
+        )
+
+        if form_url:
+
+            st.link_button(
+                "📋 Submit My Results",
+                form_url,
+                use_container_width=True
+            )
+
         else:
-            st.warning("⚠️ Please add your Google Form link in Line 7!")
-        
+
+            st.warning(
+                "Your Google Form hasn't been connected yet. "
+                "Add your Form link and entry IDs at the top of the code."
+            )
+
+
+        # ====================================================
+        # EXPLANATION
+        # ====================================================
+
         st.markdown("---")
-        st.success(f"Thank you for using PathPilot, {name}! 🎉")
-        st.info("💛 Remember: NO path is 'better' — what matters is what fits YOU. Every student belongs here! 🌍✨")
+
+        st.subheader(
+            "🧭 Your results are a starting point"
+        )
+
+        st.write(
+            "A PathPilot match isn't a prediction of your future. "
+            "It's simply a way of connecting your current interests, "
+            "skills and preferences with careers you may want to explore."
+        )
+
+        st.write(
+            "Your interests can change, your skills can develop, "
+            "and there are often multiple routes into the same career."
+        )
+
+
+# ============================================================
+# FOOTER
+# ============================================================
+
+st.markdown("---")
+
+st.caption(
+    "💛 PathPilot — Your path, your playbook. "
+    "No wrong moves — just what works for YOU."
+)
