@@ -4,7 +4,7 @@ from datetime import datetime
 # ==============================================
 # 👇👇👇 PASTE YOUR GOOGLE FORM LINK HERE! 👇👇👇
 # ==============================================
-GOOGLE_FORM_LINK = "https://docs.google.com/forms/d/e/YOUR_LINK/viewform"
+GOOGLE_FORM_LINK = "PASTE_YOUR_FORM_LINK_HERE"
 # ==============================================
 
 # ------------------------------
