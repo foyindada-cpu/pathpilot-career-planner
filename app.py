@@ -1,5 +1,19 @@
 import streamlit as st
-import json
+from datetime import datetime
+
+# ==============================================
+# YOUR SHEET ID — ALREADY FILLED IN! ✅
+# ==============================================
+SHEET_ID = "1XFLfhDqtm8whNVZsAppokGzLt0AAPrgv7fY_y0ENrIQ"
+
+# ------------------------------
+# PAGE SETUP
+# ------------------------------
+st.set_page_config(
+    page_title="PathPilot — Career & Education Pathway Planner",
+    page_icon="🎯",
+    layout="wide"
+)
 
 # ------------------------------
 # CAREER DATA
@@ -24,23 +38,13 @@ PATHWAYS = [
 ]
 
 # ------------------------------
-# PAGE SETUP
+# MAIN APP
 # ------------------------------
-st.set_page_config(
-    page_title="PathPilot — Career & Education Pathway Planner",
-    page_icon="🎯",
-    layout="wide"
-)
-
 st.title("🎯 PathPilot — Career & Education Pathway Planner")
 st.subheader("Discover your perfect Degree Apprenticeship or University route!")
 st.markdown("---")
 
-# ------------------------------
-# USER INPUTS
-# ------------------------------
 st.header("👤 Tell us about yourself")
-
 name = st.text_input("What's your name?")
 
 st.subheader("📚 Your Subjects")
@@ -63,7 +67,7 @@ route = st.radio("Which route are you interested in?",
                  ["Degree Apprenticeship", "University", "Either"])
 
 # ------------------------------
-# CALCULATE & SHOW RESULTS
+# SUBMIT & RESULTS
 # ------------------------------
 if st.button("🚀 Get My Recommendations!", type="primary"):
     if not name:
