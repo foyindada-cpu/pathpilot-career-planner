@@ -540,12 +540,16 @@ if st.button("🚀 Find My Perfect Career!", type="primary"):
                     st.write(f"**Key Skills:** {', '.join(career['skills'])}")
                     st.write(f"**Skills to Develop:** {', '.join(career['skills_to_develop'])}")
         
-        # === SUBMIT BUTTON ===
+                # === SUBMIT BUTTON ===
         st.markdown("---")
         st.subheader("📬 Help us improve — submit your results!")
-        st.info("Click below to send your answers — it takes 10 seconds!")
+        st.info("Click below — Form opens in a NEW tab so you keep your results!")
         
-               if GOOGLE_FORM_LINK != "PASTE_YOUR_GOOGLE_FORM_LINK_HERE":
-            st.markdown(f'<a href="{GOOGLE_FORM_LINK}" target="_blank" rel="noopener noreferrer"><button style="background-color:#4CAF50;color:white;padding:12px 24px;border:none;border-radius:8px;font-size:18px;cursor:pointer;width:100%;">📋 Submit My Results — Opens in New Tab</button></a>', unsafe_allow_html=True)
+        if GOOGLE_FORM_LINK != "PASTE_YOUR_GOOGLE_FORM_LINK_HERE":
+            st.markdown(f'<a href="{GOOGLE_FORM_LINK}" target="_blank" rel="noopener noreferrer"><button style="background-color:#4CAF50;color:white;padding:12px 24px;border:none;border-radius:8px;font-size:18px;cursor:pointer;width:100%;">📋 Submit My Results</button></a>', unsafe_allow_html=True)
         else:
             st.warning("⚠️ Please add your Google Form link in the code!")
+        
+        st.markdown("---")
+        st.success(f"Thank you for using PathPilot, {name}! 🎉")
+        st.info("💛 Remember: NO path is 'better' — what matters is what fits YOU. Every student belongs here! 🌍✨")
