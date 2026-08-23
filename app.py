@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import datetime
+
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -14,6 +15,17 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+
+
+# ============================================================
+# SESSION STATE
+# ============================================================
+
+if "results" not in st.session_state:
+    st.session_state.results = None
+
+if "submitted" not in st.session_state:
+    st.session_state.submitted = False
 
 
 # ============================================================
@@ -67,13 +79,6 @@ st.markdown(
         color: #6b7280;
     }
 
-    .section-box {
-        padding: 1.2rem;
-        border-radius: 15px;
-        background: #f7f8ff;
-        margin-bottom: 1rem;
-    }
-
     </style>
     """,
     unsafe_allow_html=True
@@ -106,7 +111,7 @@ st.markdown(
 
 
 # ============================================================
-# PATHWAYS
+# QUESTIONS
 # ============================================================
 
 st.subheader("1️⃣ What pathway are you thinking about?")
@@ -114,17 +119,13 @@ st.subheader("1️⃣ What pathway are you thinking about?")
 pathway = st.multiselect(
     "Select all that apply:",
     [
-        # Academic
         "A Levels",
         "International Baccalaureate (IB)",
-
-        # Technical
         "T Level",
         "BTEC (Level 3 / Extended Diploma)",
         "CTEC",
         "OCR Cambridge Technical",
 
-        # Apprenticeships
         "Intermediate Apprenticeship (Level 2)",
         "Advanced Apprenticeship (Level 3)",
         "Higher Apprenticeship (Level 4)",
@@ -132,7 +133,6 @@ pathway = st.multiselect(
         "Degree Apprenticeship (Level 6)",
         "Degree Apprenticeship (Level 7)",
 
-        # Other routes
         "University",
         "School Leaver Programme",
         "Access to HE",
@@ -141,10 +141,6 @@ pathway = st.multiselect(
     ]
 )
 
-
-# ============================================================
-# SUBJECTS
-# ============================================================
 
 st.subheader("2️⃣ What subjects are you studying right now?")
 
@@ -182,10 +178,6 @@ subjects = st.multiselect(
 )
 
 
-# ============================================================
-# SKILLS
-# ============================================================
-
 st.subheader("3️⃣ What are your best skills?")
 
 st.caption(
@@ -200,10 +192,6 @@ skills = st.text_area(
     placeholder="e.g. coding, problem-solving, teamwork..."
 )
 
-
-# ============================================================
-# INTERESTS
-# ============================================================
 
 st.subheader("4️⃣ What do you enjoy doing most?")
 
@@ -236,10 +224,6 @@ interests = st.multiselect(
     ]
 )
 
-
-# ============================================================
-# INDUSTRIES
-# ============================================================
 
 st.subheader("5️⃣ Which industries interest you most?")
 
@@ -276,10 +260,6 @@ industries = st.multiselect(
 )
 
 
-# ============================================================
-# WORK ENVIRONMENT
-# ============================================================
-
 st.subheader("6️⃣ What kind of work environment do you prefer?")
 
 environment = st.multiselect(
@@ -298,10 +278,6 @@ environment = st.multiselect(
     ]
 )
 
-
-# ============================================================
-# PRIORITIES
-# ============================================================
 
 st.subheader("7️⃣ What matters most to you?")
 
@@ -330,11 +306,9 @@ CAREERS = [
 
     {
         "name": "Software Engineer",
-
         "industries": [
             "Technology, Software Development & IT"
         ],
-
         "subjects": [
             "Maths",
             "Further Maths",
@@ -342,14 +316,12 @@ CAREERS = [
             "Physics",
             "IT / Digital Technology"
         ],
-
         "interests": [
             "Coding, programming & software development",
             "Gaming, esports & streaming",
             "Building, making, fixing & hands-on creating",
             "Working with numbers, data, maths & analysing facts"
         ],
-
         "keywords": [
             "coding",
             "programming",
@@ -358,10 +330,8 @@ CAREERS = [
             "technology",
             "problem-solving",
             "data",
-            "algorithms",
-            "programming"
+            "algorithms"
         ],
-
         "environment": [
             "Professional office setting",
             "Fast-paced & busy",
@@ -369,7 +339,6 @@ CAREERS = [
             "Team-focused",
             "Independent working"
         ],
-
         "values": [
             "High earning potential",
             "Fast career progression",
@@ -377,14 +346,15 @@ CAREERS = [
             "Creative freedom",
             "Good work-life balance"
         ],
-
+        "levels": [3, 4, 5, 6, 7],
         "routes": [
             "University",
             "Degree Apprenticeship (Level 6)",
-            "Higher Apprenticeship (Level 4/5)",
+            "Degree Apprenticeship (Level 7)",
+            "Higher Apprenticeship (Level 4)",
+            "Higher Apprenticeship (Level 5)",
             "Advanced Apprenticeship (Level 3)"
         ],
-
         "skills_to_build": [
             "Python",
             "Git & GitHub",
@@ -396,13 +366,11 @@ CAREERS = [
 
     {
         "name": "Data Scientist",
-
         "industries": [
             "Technology, Software Development & IT",
             "Science, Research, Biotech & Pharmaceuticals",
             "Business, Finance, Accounting & Banking"
         ],
-
         "subjects": [
             "Maths",
             "Further Maths",
@@ -410,14 +378,12 @@ CAREERS = [
             "Economics",
             "Physics"
         ],
-
         "interests": [
             "Working with numbers, data, maths & analysing facts",
             "Science experiments, research & discovering new things",
             "Coding, programming & software development",
             "Reading, learning & discovering new things"
         ],
-
         "keywords": [
             "data",
             "maths",
@@ -428,7 +394,6 @@ CAREERS = [
             "python",
             "numbers"
         ],
-
         "environment": [
             "Professional office setting",
             "Lab / research facility",
@@ -436,20 +401,20 @@ CAREERS = [
             "Independent working",
             "Team-focused"
         ],
-
         "values": [
             "High earning potential",
             "Learning new skills",
             "Making an impact",
             "Fast career progression"
         ],
-
+        "levels": [4, 5, 6, 7],
         "routes": [
             "University",
             "Degree Apprenticeship (Level 6)",
-            "Higher Apprenticeship (Level 4/5)"
+            "Degree Apprenticeship (Level 7)",
+            "Higher Apprenticeship (Level 4)",
+            "Higher Apprenticeship (Level 5)"
         ],
-
         "skills_to_build": [
             "Python",
             "Statistics",
@@ -461,12 +426,10 @@ CAREERS = [
 
     {
         "name": "Cyber Security Analyst",
-
         "industries": [
             "Technology, Software Development & IT",
             "Law Enforcement, Security & Intelligence"
         ],
-
         "subjects": [
             "Computer Science",
             "Maths",
@@ -474,14 +437,12 @@ CAREERS = [
             "IT / Digital Technology",
             "Physics"
         ],
-
         "interests": [
             "Coding, programming & software development",
             "Gaming, esports & streaming",
             "Debating, politics, current affairs & discussing ideas",
             "Reading, learning & discovering new things"
         ],
-
         "keywords": [
             "coding",
             "security",
@@ -492,7 +453,6 @@ CAREERS = [
             "computers",
             "networking"
         ],
-
         "environment": [
             "Professional office setting",
             "Fast-paced & busy",
@@ -500,7 +460,6 @@ CAREERS = [
             "Team-focused",
             "Independent working"
         ],
-
         "values": [
             "High earning potential",
             "Job security",
@@ -508,14 +467,15 @@ CAREERS = [
             "Making an impact",
             "Fast career progression"
         ],
-
+        "levels": [3, 4, 5, 6, 7],
         "routes": [
             "University",
             "Degree Apprenticeship (Level 6)",
-            "Higher Apprenticeship (Level 4/5)",
+            "Degree Apprenticeship (Level 7)",
+            "Higher Apprenticeship (Level 4)",
+            "Higher Apprenticeship (Level 5)",
             "Advanced Apprenticeship (Level 3)"
         ],
-
         "skills_to_build": [
             "Networking",
             "Python",
@@ -527,24 +487,20 @@ CAREERS = [
 
     {
         "name": "Accountant",
-
         "industries": [
             "Business, Finance, Accounting & Banking"
         ],
-
         "subjects": [
             "Maths",
             "Further Maths",
             "Economics",
             "Business Studies"
         ],
-
         "interests": [
             "Working with numbers, data, maths & analysing facts",
             "Business ideas, entrepreneurship & starting projects",
             "Reading, learning & discovering new things"
         ],
-
         "keywords": [
             "numbers",
             "maths",
@@ -554,14 +510,12 @@ CAREERS = [
             "business",
             "economics"
         ],
-
         "environment": [
             "Professional office setting",
             "Fast-paced & busy",
             "Team-focused",
             "Independent working"
         ],
-
         "values": [
             "High earning potential",
             "Job security",
@@ -569,14 +523,15 @@ CAREERS = [
             "Learning new skills",
             "Good work-life balance"
         ],
-
+        "levels": [3, 4, 5, 6, 7],
         "routes": [
             "University",
             "Degree Apprenticeship (Level 6)",
-            "Higher Apprenticeship (Level 4/5)",
+            "Degree Apprenticeship (Level 7)",
+            "Higher Apprenticeship (Level 4)",
+            "Higher Apprenticeship (Level 5)",
             "School Leaver Programme"
         ],
-
         "skills_to_build": [
             "Financial analysis",
             "Excel",
@@ -588,26 +543,22 @@ CAREERS = [
 
     {
         "name": "Business Analyst",
-
         "industries": [
             "Business, Finance, Accounting & Banking",
             "Technology, Software Development & IT"
         ],
-
         "subjects": [
             "Maths",
             "Economics",
             "Business Studies",
             "Computer Science"
         ],
-
         "interests": [
             "Business ideas, entrepreneurship & starting projects",
             "Working with numbers, data, maths & analysing facts",
             "Planning events, organising & bringing people together",
             "Coding, programming & software development"
         ],
-
         "keywords": [
             "analysis",
             "business",
@@ -618,14 +569,12 @@ CAREERS = [
             "research",
             "planning"
         ],
-
         "environment": [
             "Professional office setting",
             "Team-focused",
             "Fast-paced & busy",
             "Independent working"
         ],
-
         "values": [
             "High earning potential",
             "Fast career progression",
@@ -633,13 +582,14 @@ CAREERS = [
             "Working with people",
             "Good work-life balance"
         ],
-
+        "levels": [4, 5, 6, 7],
         "routes": [
             "University",
             "Degree Apprenticeship (Level 6)",
-            "Higher Apprenticeship (Level 4/5)"
+            "Degree Apprenticeship (Level 7)",
+            "Higher Apprenticeship (Level 4)",
+            "Higher Apprenticeship (Level 5)"
         ],
-
         "skills_to_build": [
             "Excel",
             "Data analysis",
@@ -651,12 +601,10 @@ CAREERS = [
 
     {
         "name": "Civil Engineer",
-
         "industries": [
             "Engineering — Mechanical, Electrical, Civil & Aerospace",
             "Construction, Architecture, Surveying & Property"
         ],
-
         "subjects": [
             "Maths",
             "Further Maths",
@@ -664,13 +612,11 @@ CAREERS = [
             "Engineering",
             "Geography"
         ],
-
         "interests": [
             "Building, making, fixing & hands-on creating",
             "Working with numbers, data, maths & analysing facts",
             "Science experiments, research & discovering new things"
         ],
-
         "keywords": [
             "maths",
             "engineering",
@@ -680,27 +626,26 @@ CAREERS = [
             "physics",
             "construction"
         ],
-
         "environment": [
             "Working outdoors / on-site",
             "Professional office setting",
             "Team-focused",
             "Fast-paced & busy"
         ],
-
         "values": [
             "High earning potential",
             "Job security",
             "Making an impact",
             "Learning new skills"
         ],
-
+        "levels": [4, 5, 6, 7],
         "routes": [
             "University",
             "Degree Apprenticeship (Level 6)",
-            "Higher Apprenticeship (Level 4/5)"
+            "Degree Apprenticeship (Level 7)",
+            "Higher Apprenticeship (Level 4)",
+            "Higher Apprenticeship (Level 5)"
         ],
-
         "skills_to_build": [
             "CAD",
             "Engineering mathematics",
@@ -712,24 +657,20 @@ CAREERS = [
 
     {
         "name": "Doctor / Medical Practitioner",
-
         "industries": [
             "Healthcare, Medicine, Nursing & Mental Health"
         ],
-
         "subjects": [
             "Biology",
             "Chemistry",
             "Maths",
             "Physics"
         ],
-
         "interests": [
             "Science experiments, research & discovering new things",
             "Helping people, mentoring, charity & community work",
             "Reading, learning & discovering new things"
         ],
-
         "keywords": [
             "biology",
             "science",
@@ -739,14 +680,12 @@ CAREERS = [
             "communication",
             "problem-solving"
         ],
-
         "environment": [
             "Lab / research facility",
             "Fast-paced & busy",
             "Customer-facing",
             "Team-focused"
         ],
-
         "values": [
             "Helping people",
             "Making an impact",
@@ -754,11 +693,10 @@ CAREERS = [
             "Learning new skills",
             "Working with people"
         ],
-
+        "levels": [6, 7],
         "routes": [
             "University"
         ],
-
         "skills_to_build": [
             "Biology",
             "Chemistry",
@@ -770,26 +708,22 @@ CAREERS = [
 
     {
         "name": "Graphic Designer",
-
         "industries": [
             "Creative, Media, Design, Film & Journalism",
             "Marketing, Advertising, PR & Communications"
         ],
-
         "subjects": [
             "Art & Design",
             "Graphic Design",
             "Media Studies",
             "Computer Science"
         ],
-
         "interests": [
             "Art, design, drawing & creative work",
             "Photography, videography & visual storytelling",
             "Social media, content creation, marketing & trends",
             "Fashion, beauty, styling & lifestyle"
         ],
-
         "keywords": [
             "design",
             "creative",
@@ -798,27 +732,25 @@ CAREERS = [
             "branding",
             "content"
         ],
-
         "environment": [
             "Creative / relaxed vibe",
             "Remote / from home",
             "Team-focused",
             "Independent working"
         ],
-
         "values": [
             "Creative freedom",
             "Learning new skills",
             "Good work-life balance",
             "Making an impact"
         ],
-
+        "levels": [3, 4, 5, 6],
         "routes": [
             "University",
             "Advanced Apprenticeship (Level 3)",
-            "Higher Apprenticeship (Level 4/5)"
+            "Higher Apprenticeship (Level 4)",
+            "Higher Apprenticeship (Level 5)"
         ],
-
         "skills_to_build": [
             "Adobe Creative Suite",
             "Typography",
@@ -830,26 +762,22 @@ CAREERS = [
 
     {
         "name": "Marketing Executive",
-
         "industries": [
             "Marketing, Advertising, PR & Communications",
             "Creative, Media, Design, Film & Journalism"
         ],
-
         "subjects": [
             "Business Studies",
             "Media Studies",
             "English Language",
             "Art & Design"
         ],
-
         "interests": [
             "Social media, content creation, marketing & trends",
             "Writing, journalism, blogging & content creation",
             "Business ideas, entrepreneurship & starting projects",
             "Photography, videography & visual storytelling"
         ],
-
         "keywords": [
             "creative",
             "marketing",
@@ -859,7 +787,6 @@ CAREERS = [
             "business",
             "communication"
         ],
-
         "environment": [
             "Creative / relaxed vibe",
             "Professional office setting",
@@ -867,7 +794,6 @@ CAREERS = [
             "Team-focused",
             "Customer-facing"
         ],
-
         "values": [
             "Creative freedom",
             "Fast career progression",
@@ -875,14 +801,15 @@ CAREERS = [
             "Making an impact",
             "Learning new skills"
         ],
-
+        "levels": [3, 4, 5, 6, 7],
         "routes": [
             "University",
             "Degree Apprenticeship (Level 6)",
-            "Higher Apprenticeship (Level 4/5)",
+            "Degree Apprenticeship (Level 7)",
+            "Higher Apprenticeship (Level 4)",
+            "Higher Apprenticeship (Level 5)",
             "Advanced Apprenticeship (Level 3)"
         ],
-
         "skills_to_build": [
             "Social media",
             "Copywriting",
@@ -894,11 +821,9 @@ CAREERS = [
 
     {
         "name": "Lawyer / Solicitor",
-
         "industries": [
             "Law, Legal Services, Politics & Government"
         ],
-
         "subjects": [
             "English Language",
             "English Literature",
@@ -906,13 +831,11 @@ CAREERS = [
             "Law",
             "Philosophy & Ethics"
         ],
-
         "interests": [
             "Debating, politics, current affairs & discussing ideas",
             "Writing, journalism, blogging & content creation",
             "Reading, learning & discovering new things"
         ],
-
         "keywords": [
             "debating",
             "research",
@@ -922,7 +845,6 @@ CAREERS = [
             "analysis",
             "law"
         ],
-
         "environment": [
             "Professional office setting",
             "Fast-paced & busy",
@@ -930,7 +852,6 @@ CAREERS = [
             "Independent working",
             "Customer-facing"
         ],
-
         "values": [
             "High earning potential",
             "Fast career progression",
@@ -938,12 +859,11 @@ CAREERS = [
             "Working with people",
             "Learning new skills"
         ],
-
+        "levels": [6, 7],
         "routes": [
             "University",
             "Solicitor Apprenticeship (Level 7)"
         ],
-
         "skills_to_build": [
             "Legal research",
             "Writing",
@@ -955,11 +875,9 @@ CAREERS = [
 
     {
         "name": "Teacher",
-
         "industries": [
             "Education, Teaching & Training"
         ],
-
         "subjects": [
             "Maths",
             "English Language",
@@ -971,13 +889,11 @@ CAREERS = [
             "History",
             "Geography"
         ],
-
         "interests": [
             "Teaching, explaining, tutoring & supporting others",
             "Helping people, mentoring, charity & community work",
             "Reading, learning & discovering new things"
         ],
-
         "keywords": [
             "teaching",
             "communication",
@@ -987,14 +903,12 @@ CAREERS = [
             "explaining",
             "people"
         ],
-
         "environment": [
             "Customer-facing",
             "Team-focused",
             "Professional office setting",
             "Fast-paced & busy"
         ],
-
         "values": [
             "Helping people",
             "Making an impact",
@@ -1002,13 +916,13 @@ CAREERS = [
             "Working with people",
             "Learning new skills"
         ],
-
+        "levels": [3, 6, 7],
         "routes": [
             "University",
             "Degree Apprenticeship (Level 6)",
+            "Degree Apprenticeship (Level 7)",
             "Teacher Training"
         ],
-
         "skills_to_build": [
             "Public speaking",
             "Lesson planning",
@@ -1020,26 +934,22 @@ CAREERS = [
 
     {
         "name": "Project Manager",
-
         "industries": [
             "Business, Finance, Accounting & Banking",
             "Construction, Architecture, Surveying & Property",
             "Technology, Software Development & IT"
         ],
-
         "subjects": [
             "Business Studies",
             "Economics",
             "Maths",
             "Computer Science"
         ],
-
         "interests": [
             "Planning events, organising & bringing people together",
             "Business ideas, entrepreneurship & starting projects",
             "Building, making, fixing & hands-on creating"
         ],
-
         "keywords": [
             "planning",
             "organisation",
@@ -1049,14 +959,12 @@ CAREERS = [
             "project",
             "problem-solving"
         ],
-
         "environment": [
             "Professional office setting",
             "Fast-paced & busy",
             "Team-focused",
             "Customer-facing"
         ],
-
         "values": [
             "Fast career progression",
             "Working with people",
@@ -1064,13 +972,14 @@ CAREERS = [
             "Making an impact",
             "Learning new skills"
         ],
-
+        "levels": [4, 5, 6, 7],
         "routes": [
             "University",
             "Degree Apprenticeship (Level 6)",
-            "Higher Apprenticeship (Level 4/5)"
+            "Degree Apprenticeship (Level 7)",
+            "Higher Apprenticeship (Level 4)",
+            "Higher Apprenticeship (Level 5)"
         ],
-
         "skills_to_build": [
             "Leadership",
             "Planning",
@@ -1082,25 +991,21 @@ CAREERS = [
 
     {
         "name": "Psychologist",
-
         "industries": [
             "Healthcare, Medicine, Nursing & Mental Health",
             "Education, Teaching & Training"
         ],
-
         "subjects": [
             "Psychology",
             "Biology",
             "Maths",
             "English Language"
         ],
-
         "interests": [
             "Helping people, mentoring, charity & community work",
             "Science experiments, research & discovering new things",
             "Teaching, explaining, tutoring & supporting others"
         ],
-
         "keywords": [
             "psychology",
             "research",
@@ -1110,25 +1015,22 @@ CAREERS = [
             "empathy",
             "analysis"
         ],
-
         "environment": [
             "Customer-facing",
             "Professional office setting",
             "Lab / research facility",
             "Team-focused"
         ],
-
         "values": [
             "Helping people",
             "Making an impact",
             "Learning new skills",
             "Working with people"
         ],
-
+        "levels": [6, 7],
         "routes": [
             "University"
         ],
-
         "skills_to_build": [
             "Research",
             "Statistics",
@@ -1140,26 +1042,22 @@ CAREERS = [
 
     {
         "name": "Digital Marketer / Social Media Manager",
-
         "industries": [
             "Marketing, Advertising, PR & Communications",
             "Creative, Media, Design, Film & Journalism"
         ],
-
         "subjects": [
             "Media Studies",
             "Business Studies",
             "English Language",
             "Art & Design"
         ],
-
         "interests": [
             "Social media, content creation, marketing & trends",
             "Writing, journalism, blogging & content creation",
             "Photography, videography & visual storytelling",
             "Business ideas, entrepreneurship & starting projects"
         ],
-
         "keywords": [
             "social",
             "media",
@@ -1169,28 +1067,26 @@ CAREERS = [
             "writing",
             "communication"
         ],
-
         "environment": [
             "Creative / relaxed vibe",
             "Remote / from home",
             "Team-focused",
             "Fast-paced & busy"
         ],
-
         "values": [
             "Creative freedom",
             "Good work-life balance",
             "Fast career progression",
             "Learning new skills"
         ],
-
+        "levels": [3, 4, 5, 6],
         "routes": [
             "University",
             "Degree Apprenticeship (Level 6)",
-            "Higher Apprenticeship (Level 4/5)",
+            "Higher Apprenticeship (Level 4)",
+            "Higher Apprenticeship (Level 5)",
             "Advanced Apprenticeship (Level 3)"
         ],
-
         "skills_to_build": [
             "Social media strategy",
             "Content creation",
@@ -1202,12 +1098,10 @@ CAREERS = [
 
     {
         "name": "Architect",
-
         "industries": [
             "Construction, Architecture, Surveying & Property",
             "Creative, Media, Design, Film & Journalism"
         ],
-
         "subjects": [
             "Maths",
             "Art & Design",
@@ -1215,13 +1109,11 @@ CAREERS = [
             "Physics",
             "Engineering"
         ],
-
         "interests": [
             "Art, design, drawing & creative work",
             "Building, making, fixing & hands-on creating",
             "Photography, videography & visual storytelling"
         ],
-
         "keywords": [
             "design",
             "art",
@@ -1231,26 +1123,24 @@ CAREERS = [
             "architecture",
             "drawing"
         ],
-
         "environment": [
             "Creative / relaxed vibe",
             "Professional office setting",
             "Working outdoors / on-site",
             "Team-focused"
         ],
-
         "values": [
             "Creative freedom",
             "Making an impact",
             "Learning new skills",
             "Working with people"
         ],
-
+        "levels": [6, 7],
         "routes": [
             "University",
-            "Degree Apprenticeship (Level 6)"
+            "Degree Apprenticeship (Level 6)",
+            "Degree Apprenticeship (Level 7)"
         ],
-
         "skills_to_build": [
             "CAD",
             "Technical drawing",
@@ -1262,25 +1152,21 @@ CAREERS = [
 
     {
         "name": "Environmental Scientist",
-
         "industries": [
             "Environment, Sustainability, Green Energy & Conservation",
             "Science, Research, Biotech & Pharmaceuticals"
         ],
-
         "subjects": [
             "Biology",
             "Chemistry",
             "Geography",
             "Physics"
         ],
-
         "interests": [
             "Nature, animals, wildlife & the environment",
             "Science experiments, research & discovering new things",
             "Reading, learning & discovering new things"
         ],
-
         "keywords": [
             "science",
             "environment",
@@ -1290,25 +1176,23 @@ CAREERS = [
             "analysis",
             "sustainability"
         ],
-
         "environment": [
             "Lab / research facility",
             "Working outdoors / on-site",
             "Independent working",
             "Team-focused"
         ],
-
         "values": [
             "Making an impact",
             "Learning new skills",
             "Job security"
         ],
-
+        "levels": [6, 7],
         "routes": [
             "University",
-            "Degree Apprenticeship (Level 6)"
+            "Degree Apprenticeship (Level 6)",
+            "Degree Apprenticeship (Level 7)"
         ],
-
         "skills_to_build": [
             "Research",
             "Data analysis",
@@ -1320,23 +1204,19 @@ CAREERS = [
 
     {
         "name": "Sports Coach",
-
         "industries": [
             "Sports, Fitness, Leisure & Nutrition"
         ],
-
         "subjects": [
             "PE / Sports Science",
             "Biology",
             "Psychology"
         ],
-
         "interests": [
             "Sports, fitness, training & outdoor activities",
             "Teaching, explaining, tutoring & supporting others",
             "Helping people, mentoring, charity & community work"
         ],
-
         "keywords": [
             "sports",
             "fitness",
@@ -1346,27 +1226,25 @@ CAREERS = [
             "helping",
             "communication"
         ],
-
         "environment": [
             "Working outdoors / on-site",
             "Customer-facing",
             "Team-focused",
             "Fast-paced & busy"
         ],
-
         "values": [
             "Helping people",
             "Making an impact",
             "Working with people",
             "Job security"
         ],
-
+        "levels": [3, 4, 5, 6],
         "routes": [
             "Advanced Apprenticeship (Level 3)",
-            "Higher Apprenticeship (Level 4/5)",
+            "Higher Apprenticeship (Level 4)",
+            "Higher Apprenticeship (Level 5)",
             "University"
         ],
-
         "skills_to_build": [
             "Leadership",
             "Coaching",
@@ -1387,7 +1265,7 @@ def calculate_match(career):
     score = 0
     reasons = []
 
-    # Maximum possible weighting:
+    # Maximum:
     # Pathway = 15
     # Industry = 20
     # Subjects = 20
@@ -1396,48 +1274,52 @@ def calculate_match(career):
     # Environment = 5
     # Values = 5
     #
-    # Total = 100
-
-    max_score = 100
+    # TOTAL = 100
 
     # --------------------------------------------------------
     # PATHWAY
     # --------------------------------------------------------
 
-    selected_levels = []
+    selected_levels = set()
 
     for item in pathway:
 
         if "Level 2" in item:
-            selected_levels.append(2)
+            selected_levels.add(2)
 
         elif "Level 3" in item:
-            selected_levels.append(3)
+            selected_levels.add(3)
 
         elif "Level 4" in item:
-            selected_levels.append(4)
+            selected_levels.add(4)
 
         elif "Level 5" in item:
-            selected_levels.append(5)
+            selected_levels.add(5)
 
         elif "Level 6" in item:
-            selected_levels.append(6)
+            selected_levels.add(6)
 
         elif "Level 7" in item:
-            selected_levels.append(7)
+            selected_levels.add(7)
 
         elif item == "University":
-            selected_levels.extend([6, 7])
+            selected_levels.update([6, 7])
 
         elif item in [
             "A Levels",
+            "International Baccalaureate (IB)",
             "T Level",
             "BTEC (Level 3 / Extended Diploma)",
             "CTEC",
-            "OCR Cambridge Technical",
-            "International Baccalaureate (IB)"
+            "OCR Cambridge Technical"
         ]:
-            selected_levels.append(3)
+            selected_levels.add(3)
+
+        elif item == "School Leaver Programme":
+            selected_levels.add(3)
+
+        elif item == "Access to HE":
+            selected_levels.update([3, 4, 5])
 
     if not pathway or "Not sure yet" in pathway:
 
@@ -1445,27 +1327,9 @@ def calculate_match(career):
 
     else:
 
-        # If they selected a pathway, we give partial
-        # credit rather than assuming a specific career
-        # is impossible.
-
-        route_text = " ".join(
-            career["routes"]
-        ).lower()
-
-        route_match = False
-
-        for level in selected_levels:
-
-            if f"level {level}" in route_text:
-
-                route_match = True
-                break
-
-        if "university" in pathway and "university" in route_text:
-            route_match = True
-
-        if route_match:
+        if selected_levels.intersection(
+            set(career["levels"])
+        ):
 
             score += 15
 
@@ -1477,12 +1341,12 @@ def calculate_match(career):
     # INDUSTRIES
     # --------------------------------------------------------
 
-    if industries:
+    if industries and "Not sure yet" not in industries:
 
         industry_matches = set(
             industries
         ).intersection(
-            career["industries"]
+            set(career["industries"])
         )
 
         if industry_matches:
@@ -1493,6 +1357,10 @@ def calculate_match(career):
                 "your industry interests align strongly with this role"
             )
 
+    else:
+
+        score += 10
+
     # --------------------------------------------------------
     # SUBJECTS
     # --------------------------------------------------------
@@ -1502,52 +1370,60 @@ def calculate_match(career):
         subject_matches = set(
             subjects
         ).intersection(
-            career["subjects"]
+            set(career["subjects"])
         )
 
         if subject_matches:
 
-            percentage = min(
+            subject_score = min(
                 len(subject_matches) * 7,
                 20
             )
 
-            score += percentage
+            score += subject_score
 
             reasons.append(
                 "your subjects are relevant to this career"
             )
 
+    else:
+
+        score += 10
+
     # --------------------------------------------------------
     # INTERESTS
     # --------------------------------------------------------
 
-    if interests:
+    if interests and "Not sure yet" not in interests:
 
         interest_matches = set(
             interests
         ).intersection(
-            career["interests"]
+            set(career["interests"])
         )
 
         if interest_matches:
 
-            percentage = min(
+            interest_score = min(
                 len(interest_matches) * 7,
                 20
             )
 
-            score += percentage
+            score += interest_score
 
             reasons.append(
                 "your interests match this career"
             )
 
+    else:
+
+        score += 10
+
     # --------------------------------------------------------
     # SKILLS
     # --------------------------------------------------------
 
-    if skills:
+    if skills.strip():
 
         skill_text = skills.lower()
 
@@ -1559,56 +1435,70 @@ def calculate_match(career):
 
                 keyword_matches += 1
 
-        if keyword_matches:
+        skill_score = min(
+            keyword_matches * 4,
+            15
+        )
 
-            score += min(
-                keyword_matches * 4,
-                15
-            )
+        score += skill_score
+
+        if keyword_matches:
 
             reasons.append(
                 "some of your skills could transfer well"
             )
 
+    else:
+
+        score += 7
+
     # --------------------------------------------------------
     # ENVIRONMENT
     # --------------------------------------------------------
 
-    if environment:
+    if environment and "Not sure yet" not in environment:
 
         environment_matches = set(
             environment
         ).intersection(
-            career["environment"]
+            set(career["environment"])
         )
 
-        if environment_matches:
+        environment_score = min(
+            len(environment_matches) * 2,
+            5
+        )
 
-            score += min(
-                len(environment_matches) * 2,
-                5
-            )
+        score += environment_score
+
+    else:
+
+        score += 3
 
     # --------------------------------------------------------
     # VALUES
     # --------------------------------------------------------
 
-    if values:
+    if values and "Not sure yet" not in values:
 
         value_matches = set(
             values
         ).intersection(
-            career["values"]
+            set(career["values"])
         )
 
-        if value_matches:
+        value_score = min(
+            len(value_matches) * 2,
+            5
+        )
 
-            score += min(
-                len(value_matches) * 2,
-                5
-            )
+        score += value_score
 
-    return min(score, 100), reasons
+    else:
+
+        score += 3
+
+    return min(round(score), 100), reasons
 
 
 # ============================================================
@@ -1625,7 +1515,7 @@ def connect_to_google_sheet():
         ]
 
         credentials = Credentials.from_service_account_info(
-            st.secrets["gcp_service_account"],
+            dict(st.secrets["gcp_service_account"]),
             scopes=scopes
         )
 
@@ -1647,8 +1537,9 @@ def connect_to_google_sheet():
         )
 
         st.caption(
-            "Check your Google Sheet connection and "
-            "Streamlit secrets."
+            "Check that your Streamlit Secrets are configured "
+            "correctly and that the service account has access "
+            "to the Google Sheet."
         )
 
         return None
@@ -1677,6 +1568,11 @@ def save_response(results):
             for result in results[:5]
         ]
 
+        scores = [
+            result["score"]
+            for result in results[:5]
+        ]
+
         row = [
             timestamp,
 
@@ -1684,7 +1580,7 @@ def save_response(results):
 
             ", ".join(subjects),
 
-            skills,
+            skills.strip(),
 
             ", ".join(interests),
 
@@ -1695,18 +1591,16 @@ def save_response(results):
             ", ".join(values),
 
             top_matches[0] if len(top_matches) > 0 else "",
-
             top_matches[1] if len(top_matches) > 1 else "",
-
             top_matches[2] if len(top_matches) > 2 else "",
-
             top_matches[3] if len(top_matches) > 3 else "",
-
             top_matches[4] if len(top_matches) > 4 else "",
 
-            results[0]["score"] if len(results) > 0 else "",
-            results[1]["score"] if len(results) > 1 else "",
-            results[2]["score"] if len(results) > 2 else ""
+            scores[0] if len(scores) > 0 else "",
+            scores[1] if len(scores) > 1 else "",
+            scores[2] if len(scores) > 2 else "",
+            scores[3] if len(scores) > 3 else "",
+            scores[4] if len(scores) > 4 else ""
         ]
 
         worksheet.append_row(
@@ -1719,7 +1613,7 @@ def save_response(results):
     except Exception:
 
         st.error(
-            "Your results could not be saved."
+            "Your results could not be saved right now."
         )
 
         return False
@@ -1738,7 +1632,7 @@ if st.button(
     if not any([
         pathway,
         subjects,
-        skills,
+        skills.strip(),
         interests,
         industries,
         environment,
@@ -1751,10 +1645,6 @@ if st.button(
         )
 
     else:
-
-        # ----------------------------------------------------
-        # CALCULATE RESULTS
-        # ----------------------------------------------------
 
         results = []
 
@@ -1773,173 +1663,162 @@ if st.button(
             )
 
         results.sort(
-            key=lambda x: x["score"],
+            key=lambda item: item["score"],
             reverse=True
         )
 
         top_results = results[:5]
 
-        # ----------------------------------------------------
-        # RESULTS HEADER
-        # ----------------------------------------------------
+        # Store results so they survive Streamlit reruns
+        st.session_state.results = results
+        st.session_state.submitted = False
 
-        st.markdown("---")
 
-        st.header(
-            "✨ Your PathPilot Results"
+# ============================================================
+# DISPLAY RESULTS
+# ============================================================
+
+if st.session_state.results:
+
+    top_results = st.session_state.results[:5]
+
+    st.markdown("---")
+
+    st.header("✨ Your PathPilot Results")
+
+    st.write(
+        "These matches are based on the information "
+        "you provided. They are designed to help you "
+        "explore options — not decide your future for you."
+    )
+
+    for index, result in enumerate(
+        top_results,
+        start=1
+    ):
+
+        career = result["career"]
+        score = result["score"]
+        reasons = result["reasons"]
+
+        if index == 1:
+            medal = "🥇"
+
+        elif index == 2:
+            medal = "🥈"
+
+        elif index == 3:
+            medal = "🥉"
+
+        else:
+            medal = f"{index}."
+
+        st.markdown(
+            '<div class="career-card">',
+            unsafe_allow_html=True
         )
 
-        st.write(
-            "These matches are based on the information "
-            "you provided. They are designed to help you "
-            "explore options — not decide your future for you."
-        )
+        col1, col2 = st.columns([4, 1])
 
-        # ----------------------------------------------------
-        # CAREER CARDS
-        # ----------------------------------------------------
+        with col1:
 
-        for index, result in enumerate(
-            top_results,
-            start=1
-        ):
+            st.subheader(
+                f"{medal} {career['name']}"
+            )
 
-            career = result["career"]
-
-            score = result["score"]
-
-            reasons = result["reasons"]
-
-            if index == 1:
-
-                medal = "🥇"
-
-            elif index == 2:
-
-                medal = "🥈"
-
-            elif index == 3:
-
-                medal = "🥉"
-
-            else:
-
-                medal = f"{index}."
+        with col2:
 
             st.markdown(
-                '<div class="career-card">',
+                f"""
+                <div class="match-score">
+                {score}%
+                </div>
+
+                <div class="small-text">
+                Match
+                </div>
+                """,
                 unsafe_allow_html=True
             )
 
-            col1, col2 = st.columns(
-                [4, 1]
-            )
+        st.progress(
+            score / 100
+        )
 
-            with col1:
+        st.markdown(
+            "### 💡 Why this could suit you"
+        )
 
-                st.subheader(
-                    f"{medal} {career['name']}"
-                )
+        unique_reasons = list(
+            dict.fromkeys(reasons)
+        )
 
-            with col2:
+        if unique_reasons:
 
-                st.markdown(
-                    f"""
-                    <div class="match-score">
-                    {score}%
-                    </div>
-
-                    <div class="small-text">
-                    Match
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-            st.progress(
-                score / 100
-            )
-
-            # ------------------------------------------------
-            # WHY THIS MATCH
-            # ------------------------------------------------
-
-            st.markdown(
-                "### 💡 Why this could suit you"
-            )
-
-            if reasons:
-
-                for reason in list(
-                    dict.fromkeys(reasons)
-                )[:4]:
-
-                    st.write(
-                        f"✓ {reason.capitalize()}."
-                    )
-
-            else:
+            for reason in unique_reasons[:4]:
 
                 st.write(
-                    "Your answers show some potential "
-                    "alignment with this career."
+                    f"✓ {reason.capitalize()}."
                 )
 
-            # ------------------------------------------------
-            # ROUTES
-            # ------------------------------------------------
-
-            st.markdown(
-                "### 🎓 Possible routes"
-            )
-
-            for route in career["routes"]:
-
-                st.write(
-                    f"• {route}"
-                )
-
-            # ------------------------------------------------
-            # SKILLS
-            # ------------------------------------------------
-
-            st.markdown(
-                "### 🛠️ Skills worth developing"
-            )
+        else:
 
             st.write(
-                " • ".join(
-                    career["skills_to_build"]
-                )
+                "Your answers show some potential "
+                "alignment with this career."
             )
 
-            st.markdown(
-                "</div>",
-                unsafe_allow_html=True
+        st.markdown(
+            "### 🎓 Possible routes"
+        )
+
+        for route in career["routes"]:
+
+            st.write(
+                f"• {route}"
             )
 
-        # ----------------------------------------------------
-        # SAVE TO GOOGLE SHEETS
-        # ----------------------------------------------------
-
-        st.markdown("---")
-
-        st.subheader(
-            "📊 Help us improve PathPilot"
+        st.markdown(
+            "### 🛠️ Skills worth developing"
         )
 
         st.write(
-            "Want to help us understand which pathways "
-            "and careers young people are exploring?"
+            " • ".join(
+                career["skills_to_build"]
+            )
         )
 
-        st.caption(
-            "Your results are submitted without your "
-            "name or email address."
+        st.markdown(
+            "</div>",
+            unsafe_allow_html=True
         )
+
+
+    # ========================================================
+    # GOOGLE SHEETS SUBMISSION
+    # ========================================================
+
+    st.markdown("---")
+
+    st.subheader(
+        "📊 Help us improve PathPilot"
+    )
+
+    st.write(
+        "Want to help us understand which pathways "
+        "and careers young people are exploring?"
+    )
+
+    st.caption(
+        "We don't ask for your name or email address. "
+        "Your responses are used to understand trends "
+        "in PathPilot users' pathway and career interests."
+    )
+
+    if not st.session_state.submitted:
 
         if st.button(
-            "📋 Submit My Anonymous Results",
+            "📋 Submit My Results",
             use_container_width=True
         ):
 
@@ -1948,10 +1827,12 @@ if st.button(
             ):
 
                 success = save_response(
-                    results
+                    st.session_state.results
                 )
 
             if success:
+
+                st.session_state.submitted = True
 
                 st.success(
                     "✅ Your results have been submitted!"
@@ -1967,6 +1848,13 @@ if st.button(
                     "We couldn't save your results right now. "
                     "You can still use PathPilot normally."
                 )
+
+    else:
+
+        st.success(
+            "✅ Your results have already been submitted. "
+            "Thank you for helping PathPilot! 💛"
+        )
 
 
 # ============================================================
