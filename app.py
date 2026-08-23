@@ -12,14 +12,14 @@ st.set_page_config(
 )
 
 # ============================================================
-# SESSION STATE
+# SESSION STATE — PERMANENT ANONYMOUS SUBMISSIONS
 # ============================================================
 if "results" not in st.session_state:
     st.session_state.results = None
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
-if "all_responses" not in st.session_state:
-    st.session_state.all_responses = []
+if "submissions" not in st.session_state:
+    st.session_state.submissions = []  # Only YOU see these
 
 # ============================================================
 # STYLING
@@ -43,23 +43,16 @@ st.markdown(
         border: 1px solid #e5e7eb;
         margin-bottom: 1.5rem;
         background: white;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.06);
     }
     .match-score { font-size: 2rem; font-weight: 700; }
     .small-text { color: #6b7280; }
-    .response-box {
-        background: #f9fafb;
+    .admin-box {
+        background: #f0f4ff;
         padding: 1rem;
         border-radius: 12px;
         margin: 0.5rem 0;
         border-left: 4px solid #667eea;
-    }
-    .section-heading {
-        background: #f0f4ff;
-        padding: 1rem;
-        border-radius: 12px;
-        border-left: 4px solid #667eea;
-        margin: 1.5rem 0 1rem 0;
     }
     </style>
     """,
@@ -67,7 +60,39 @@ st.markdown(
 )
 
 # ============================================================
-# HERO — FOR EVERYONE, AT ANY STAGE! 🎒🎓
+# 🔒 SECRET ADMIN DASHBOARD — ONLY YOU SEE THIS
+# ============================================================
+query_params = st.query_params
+if query_params.get("admin") == "yes":
+    st.markdown("## 🔐 ADMIN DASHBOARD — YOUR DATA ONLY")
+    st.info("✅ No one else sees this — only you!")
+    
+    total = len(st.session_state.submissions)
+    st.metric("📊 Total Submissions", total)
+    
+    if total > 0:
+        avg_score = round(sum(s["top_score"] for s in st.session_state.submissions) / total)
+        st.metric("📈 Average Match Score", f"{avg_score}%")
+        
+        st.markdown("### 📋 All Submissions (Anonymous)")
+        for i, sub in enumerate(reversed(st.session_state.submissions), 1):
+            st.markdown(f"""
+            <div class="admin-box">
+            <strong>#{i}</strong> — 🕒 {sub['time']}<br>
+            🎓 Stage: {sub['stage']}<br>
+            🥇 Top Match: <strong>{sub['top_match']}</strong> ({sub['top_score']}%)<br>
+            🏭 Interests: {sub['industries']}
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("No submissions yet!")
+    
+    st.markdown("---")
+    st.caption("← Remove ?admin=yes from the URL to go back to the main app")
+    st.stop()
+
+# ============================================================
+# 🎒 MAIN APP — FOR EVERYONE
 # ============================================================
 st.markdown(
     """
@@ -81,9 +106,9 @@ st.markdown(
 )
 
 # ============================================================
-# QUESTIONS — EVERY STAGE COVERED ✅
+# QUESTIONS
 # ============================================================
-st.markdown('<div class="section-heading"><h3>👤 Where are you at right now?</h3></div>', unsafe_allow_html=True)
+st.subheader("👤 Where are you at right now?")
 
 st.subheader("1️⃣ What stage & pathway are you on?")
 pathway = st.multiselect(
@@ -139,7 +164,7 @@ st.caption(
     "organisation, creativity, research, data analysis, public speaking, writing..."
 )
 skills = st.text_area("Your skills — be proud, list them! 💪:", 
-                      placeholder="e.g. good at problem solving, work well in teams, know some Python, great at communicating, organised, creative, good with numbers...")
+                      placeholder="e.g. good at problem solving, work well in teams, great at communicating, organised, good with numbers...")
 
 st.subheader("4️⃣ What do you ENJOY doing?")
 st.caption("Hobbies, passions, things you lose track of time doing — ALL of it matters!")
@@ -162,7 +187,7 @@ interests = st.multiselect(
         "📊 Numbers, data, maths & analysing information",
         "🌿 Nature, animals, wildlife & the environment",
         "🗣️ Debating, politics, current affairs & discussing ideas",
-        "🍳 Cooking, baking, food & hospitality",
+        "🍳 Cooking, baking & food",
         "👗 Fashion, styling & design",
         "📸 Photography, videography & visual storytelling",
         "📋 Planning, organising & bringing people together",
@@ -227,7 +252,7 @@ values = st.multiselect(
 )
 
 # ============================================================
-# CAREER DATABASE — FOR EVERY STAGE! 🎓
+# CAREER DATABASE
 # ============================================================
 CAREERS = [
     {
@@ -242,82 +267,30 @@ CAREERS = [
         "levels": [2, 3, 4, 5, 6, 7],
         "routes": [
             "GCSE → BTEC/College → Apprenticeship → Junior Dev",
-            "A Level/IB → Degree Apprenticeship (Level 6/7) → Full-Time Role",
-            "University Degree → Graduate Role / Master's → Senior Roles",
-            "Self-taught / Bootcamp → Portfolio → Junior Position"
+            "A Level/IB → Degree Apprenticeship → Full-Time Role",
+            "University → Graduate Role → Senior Roles",
+            "Self-taught → Portfolio → Junior Position"
         ],
-        "skills_to_build": ["Python", "HTML/CSS/JS", "Git & GitHub", "Problem Solving", "Logical Thinking", "Communication"]
+        "skills_to_build": ["Python", "HTML/CSS/JS", "Git & GitHub", "Problem Solving", "Communication"]
     },
     {
         "name": "Data Scientist / Analyst",
         "short_desc": "Turn numbers into stories — help businesses make smart decisions",
-        "industries": ["💻 Technology, Software Development, IT & Digital", "💰 Business, Finance, Accounting, Banking & Economics", "🔬 Science, Research, Biotech & Pharmaceuticals"],
-        "subjects": ["Maths", "Further Maths", "Computer Science", "Data Science", "Economics"],
-        "interests": ["📊 Numbers, data, maths & analysing information", "🔬 Science — experiments, research & discovering how things work", "💻 Coding, programming, tech & software development"],
-        "keywords": ["data", "maths", "statistics", "analysis", "research", "patterns", "insights"],
+        "industries": ["💻 Technology, Software Development, IT & Digital", "💰 Business, Finance, Accounting, Banking & Economics"],
+        "subjects": ["Maths", "Computer Science", "Data Science", "Economics"],
+        "interests": ["📊 Numbers, data, maths & analysing information", "🔬 Science — experiments, research & discovering how things work"],
+        "keywords": ["data", "maths", "analysis", "patterns", "insights", "research"],
         "environment": ["🏢 Professional office setting", "🧑‍💻 Independent working", "🏠 Remote / work from home"],
-        "values": ["💷 Good earning potential", "📖 Continuous learning & growth", "🚀 Fast career progression"],
+        "values": ["💷 Good earning potential", "📖 Continuous learning & growth"],
         "levels": [3, 4, 5, 6, 7],
         "routes": [
             "A Level/IB → Higher/Degree Apprenticeship → Data Analyst",
-            "University Degree → Graduate Scheme → Junior → Senior",
-            "Bootcamp + Portfolio → Junior Analyst → Specialise"
+            "University → Graduate Scheme → Junior → Senior"
         ],
-        "skills_to_build": ["Excel", "Python", "SQL", "Statistics", "Data Visualisation", "Critical Thinking"]
+        "skills_to_build": ["Excel", "Python", "SQL", "Statistics", "Critical Thinking"]
     },
     {
-        "name": "Cyber Security Analyst",
-        "short_desc": "Protect people, companies & governments from digital threats",
-        "industries": ["💻 Technology, Software Development, IT & Digital", "⚖️ Law, Legal Services, Politics & Government", "🚔 Public Services — Police, Fire, Ambulance, Military"],
-        "subjects": ["Computer Science", "Maths", "IT / Digital Technology"],
-        "interests": ["💻 Coding, programming, tech & software development", "🎮 Gaming, esports, streaming & digital content", "🗣️ Debating, politics, current affairs & discussing ideas"],
-        "keywords": ["security", "networks", "protection", "investigation", "problem solving", "attention to detail"],
-        "environment": ["🏢 Professional office setting", "⚡ Fast-paced & busy", "🤝 Team-focused & collaborative"],
-        "values": ["🛡️ Job security & stability", "💷 Good earning potential", "🤝 Helping people / making impact"],
-        "levels": [3, 4, 5, 6, 7],
-        "routes": [
-            "GCSE → Advanced Apprenticeship → Junior Role",
-            "A Level/IB → Degree Apprenticeship or Uni → Certified Professional",
-            "Uni → Master's → Government / Senior Roles"
-        ],
-        "skills_to_build": ["Networking", "Linux", "Python", "Risk Analysis", "Attention to Detail", "Ethical Thinking"]
-    },
-    {
-        "name": "Product Manager",
-        "short_desc": "Bridge between tech & people — decide WHAT gets built & WHY",
-        "industries": ["💻 Technology, Software Development, IT & Digital", "💰 Business, Finance, Accounting, Banking & Economics"],
-        "subjects": ["Business Studies", "Economics", "Computer Science", "Psychology"],
-        "interests": ["💡 Business ideas, entrepreneurship & starting projects", "📋 Planning, organising & bringing people together", "📱 Social media, content creation, marketing & trends"],
-        "keywords": ["product", "strategy", "user", "planning", "communication", "leadership", "research"],
-        "environment": ["🏢 Professional office setting", "🤝 Team-focused & collaborative", "⚡ Fast-paced & busy"],
-        "values": ["🚀 Fast career progression", "💷 Good earning potential", "📖 Continuous learning & growth"],
-        "levels": [4, 5, 6, 7],
-        "routes": [
-            "Uni → Graduate Scheme → Associate → PM",
-            "Degree Apprenticeship → Junior → Product Manager",
-            "Industry Experience → Transition → Specialise"
-        ],
-        "skills_to_build": ["User Research", "Communication", "Strategic Thinking", "Project Management", "Data Analysis"]
-    },
-    {
-        "name": "Civil Engineer",
-        "short_desc": "Design & build the world we live in — bridges, roads, buildings, infrastructure",
-        "industries": ["🏗️ Engineering — Mechanical, Electrical, Civil, Aerospace", "🏢 Construction, Architecture, Surveying & Property"],
-        "subjects": ["Maths", "Further Maths", "Physics", "Design & Technology"],
-        "interests": ["🔨 Building, making, fixing & hands-on creating", "🔬 Science — experiments, research & discovering how things work", "📊 Numbers, data, maths & analysing information"],
-        "keywords": ["design", "construction", "maths", "physics", "planning", "practical", "problem solving"],
-        "environment": ["🏕️ Outdoors / on-site", "🏢 Professional office setting", "🤝 Team-focused & collaborative"],
-        "values": ["🛡️ Job security & stability", "🤝 Helping people / making impact", "💷 Good earning potential"],
-        "levels": [3, 4, 5, 6, 7],
-        "routes": [
-            "GCSE → BTEC → Apprenticeship → Technician → Engineer",
-            "A Level/IB → Degree Apprenticeship → Chartered Status",
-            "Uni → Master's → Senior / Project Lead"
-        ],
-        "skills_to_build": ["CAD Design", "Maths & Physics", "Project Management", "Teamwork", "Practical Skills"]
-    },
-    {
-        "name": "Marketing / Brand Strategist",
+        "name": "Marketing / Social Media Strategist",
         "short_desc": "Tell stories, build brands & connect people with ideas",
         "industries": ["📣 Marketing, Advertising, PR & Communications", "🎬 Creative, Media, Design, Film, Gaming & Journalism"],
         "subjects": ["English Language", "Business Studies", "Media", "Psychology", "Art & Design"],
@@ -331,15 +304,32 @@ CAREERS = [
             "College/Uni → Degree Apprenticeship → Specialist",
             "Portfolio → Freelance → Agency → Senior"
         ],
-        "skills_to_build": ["Social Media", "Copywriting", "Analytics", "Creativity", "Communication", "Research"]
+        "skills_to_build": ["Social Media", "Copywriting", "Analytics", "Creativity", "Communication"]
+    },
+    {
+        "name": "Civil Engineer",
+        "short_desc": "Design & build the world we live in — bridges, roads, buildings",
+        "industries": ["🏗️ Engineering — Mechanical, Electrical, Civil, Aerospace", "🏢 Construction, Architecture, Surveying & Property"],
+        "subjects": ["Maths", "Further Maths", "Physics", "Design & Technology"],
+        "interests": ["🔨 Building, making, fixing & hands-on creating", "🔬 Science — experiments, research & discovering how things work"],
+        "keywords": ["design", "construction", "maths", "physics", "planning", "practical"],
+        "environment": ["🏕️ Outdoors / on-site", "🏢 Professional office setting", "🤝 Team-focused & collaborative"],
+        "values": ["🛡️ Job security & stability", "🤝 Helping people / making impact", "💷 Good earning potential"],
+        "levels": [3, 4, 5, 6, 7],
+        "routes": [
+            "GCSE → BTEC → Apprenticeship → Technician → Engineer",
+            "A Level/IB → Degree Apprenticeship → Chartered Status",
+            "Uni → Master's → Senior / Project Lead"
+        ],
+        "skills_to_build": ["CAD Design", "Maths & Physics", "Project Management", "Teamwork", "Practical Skills"]
     },
     {
         "name": "Healthcare Professional / Nurse",
-        "short_desc": "Care for people, save lives, make a real difference every single day",
+        "short_desc": "Care for people, save lives, make a real difference every day",
         "industries": ["🏥 Healthcare, Medicine, Nursing & Mental Health"],
         "subjects": ["Biology", "Chemistry", "Combined Science (GCSE)", "Psychology"],
         "interests": ["🤝 Helping people, mentoring, charity & making a difference", "🔬 Science — experiments, research & discovering how things work"],
-        "keywords": ["caring", "people", "health", "empathy", "communication", "patience", "science"],
+        "keywords": ["caring", "people", "health", "empathy", "communication", "patience"],
         "environment": ["⚡ Fast-paced & busy", "🗣️ Customer-facing / meeting people", "🤝 Team-focused & collaborative"],
         "values": ["🤝 Helping people / making impact", "🛡️ Job security & stability", "🏆 Job satisfaction & purpose"],
         "levels": [2, 3, 4, 5, 6, 7],
@@ -348,33 +338,16 @@ CAREERS = [
             "A Level/IB → Nursing Degree / Degree Apprenticeship → Registered Nurse",
             "Uni → Master's → Specialist / Advanced Practitioner"
         ],
-        "skills_to_build": ["Empathy", "Communication", "Teamwork", "Resilience", "Organisation", "Attention to Detail"]
-    },
-    {
-        "name": "Business Analyst / Consultant",
-        "short_desc": "Help organisations work better — solve problems, improve systems, drive change",
-        "industries": ["💰 Business, Finance, Accounting, Banking & Economics", "💻 Technology, Software Development, IT & Digital"],
-        "subjects": ["Business Studies", "Economics", "Maths", "Psychology"],
-        "interests": ["💡 Business ideas, entrepreneurship & starting projects", "📊 Numbers, data, maths & analysing information", "🗣️ Debating, politics, current affairs & discussing ideas"],
-        "keywords": ["analysis", "problem solving", "strategy", "communication", "data", "planning", "improvement"],
-        "environment": ["🏢 Professional office setting", "🤝 Team-focused & collaborative", "⚡ Fast-paced & busy"],
-        "values": ["💷 Good earning potential", "🚀 Fast career progression", "📖 Continuous learning & growth"],
-        "levels": [4, 5, 6, 7],
-        "routes": [
-            "Uni → Graduate Scheme → Junior → Consultant",
-            "Degree Apprenticeship → Analyst → Senior",
-            "Industry Experience → Internal Promotion"
-        ],
-        "skills_to_build": ["Data Analysis", "Communication", "Critical Thinking", "Project Management", "Stakeholder Management"]
+        "skills_to_build": ["Empathy", "Communication", "Teamwork", "Resilience", "Organisation"]
     },
     {
         "name": "Teacher / Educator",
         "short_desc": "Shape the future — inspire, teach & make a lifelong impact",
         "industries": ["📚 Education, Teaching & Training"],
         "subjects": ["English Language", "Maths", "Biology", "Chemistry", "Physics", "History", "Geography"],
-        "interests": ["👩‍🏫 Teaching, explaining & helping others learn", "🤝 Helping people, mentoring, charity & making a difference", "📚 Reading, researching & learning new things"],
-        "keywords": ["teaching", "people", "communication", "patience", "leadership", "learning", "empathy"],
-        "environment": ["🗣️ Customer-facing / meeting people", "🤝 Team-focused & collaborative", "⚡ Fast-paced & busy"],
+        "interests": ["👩‍🏫 Teaching, explaining & helping others learn", "🤝 Helping people, mentoring, charity & making a difference"],
+        "keywords": ["teaching", "people", "communication", "patience", "leadership"],
+        "environment": ["🗣️ Customer-facing / meeting people", "🤝 Team-focused & collaborative"],
         "values": ["🤝 Helping people / making impact", "🛡️ Job security & stability", "🏆 Job satisfaction & purpose"],
         "levels": [3, 6, 7],
         "routes": [
@@ -382,24 +355,24 @@ CAREERS = [
             "Degree Apprenticeship → Qualified Teacher",
             "Subject Specialism → Further Education / Lecturing"
         ],
-        "skills_to_build": ["Communication", "Public Speaking", "Empathy", "Organisation", "Leadership", "Subject Knowledge"]
+        "skills_to_build": ["Communication", "Public Speaking", "Empathy", "Organisation", "Leadership"]
     },
     {
-        "name": "UX / UI Designer",
-        "short_desc": "Design how digital products feel — make things beautiful AND easy to use",
-        "industries": ["🎬 Creative, Media, Design, Film, Gaming & Journalism", "💻 Technology, Software Development, IT & Digital"],
-        "subjects": ["Art & Design", "Graphic Design", "Computer Science", "Psychology"],
-        "interests": ["🎨 Art, design, creativity & making things look good", "📸 Photography, videography & visual storytelling", "💻 Coding, programming, tech & software development"],
-        "keywords": ["design", "user", "creative", "visual", "empathy", "research", "problem solving"],
-        "environment": ["🎨 Creative, relaxed & informal vibe", "🧑‍💻 Independent working", "🏠 Remote / work from home"],
-        "values": ["🎨 Creative freedom & expression", "📖 Continuous learning & growth", "⚖️ Good work-life balance"],
-        "levels": [2, 3, 4, 5, 6, 7],
+        "name": "Cyber Security Analyst",
+        "short_desc": "Protect people, companies & governments from digital threats",
+        "industries": ["💻 Technology, Software Development, IT & Digital", "⚖️ Law, Legal Services, Politics & Government"],
+        "subjects": ["Computer Science", "Maths", "IT / Digital Technology"],
+        "interests": ["💻 Coding, programming, tech & software development", "🗣️ Debating, politics, current affairs & discussing ideas"],
+        "keywords": ["security", "networks", "protection", "investigation", "problem solving"],
+        "environment": ["🏢 Professional office setting", "⚡ Fast-paced & busy", "🤝 Team-focused & collaborative"],
+        "values": ["🛡️ Job security & stability", "💷 Good earning potential", "🤝 Helping people / making impact"],
+        "levels": [3, 4, 5, 6, 7],
         "routes": [
-            "GCSE → Art/Design → Apprenticeship → Junior Designer",
-            "College/Uni → Degree Apprenticeship → Mid-Level",
-            "Portfolio → Freelance → Agency → Senior"
+            "GCSE → Advanced Apprenticeship → Junior Role",
+            "A Level/IB → Degree Apprenticeship or Uni → Certified Professional",
+            "Uni → Master's → Government / Senior Roles"
         ],
-        "skills_to_build": ["Figma", "User Research", "Visual Design", "Empathy", "Problem Solving", "Communication"]
+        "skills_to_build": ["Networking", "Linux", "Python", "Risk Analysis", "Attention to Detail"]
     },
     {
         "name": "Financial Analyst / Accountant",
@@ -407,7 +380,7 @@ CAREERS = [
         "industries": ["💰 Business, Finance, Accounting, Banking & Economics"],
         "subjects": ["Maths", "Further Maths", "Business Studies", "Economics"],
         "interests": ["📊 Numbers, data, maths & analysing information", "💡 Business ideas, entrepreneurship & starting projects"],
-        "keywords": ["numbers", "finance", "analysis", "accuracy", "organisation", "business", "detail"],
+        "keywords": ["numbers", "finance", "analysis", "accuracy", "organisation", "business"],
         "environment": ["🏢 Professional office setting", "🤝 Team-focused & collaborative", "🧑‍💻 Independent working"],
         "values": ["💷 Good earning potential", "🛡️ Job security & stability", "🚀 Fast career progression"],
         "levels": [2, 3, 4, 5, 6, 7],
@@ -416,29 +389,12 @@ CAREERS = [
             "A Level/IB → Degree Apprenticeship / Uni → ACCA/CIMA",
             "Graduate → Chartered → Senior / Partner"
         ],
-        "skills_to_build": ["Excel", "Attention to Detail", "Analysis", "Organisation", "Communication", "Integrity"]
-    },
-    {
-        "name": "Sustainability / Environmental Scientist",
-        "short_desc": "Fight climate change — protect our planet for future generations",
-        "industries": ["🌱 Environment, Sustainability, Green Energy & Conservation", "🔬 Science, Research, Biotech & Pharmaceuticals"],
-        "subjects": ["Biology", "Chemistry", "Physics", "Geography"],
-        "interests": ["🌿 Nature, animals, wildlife & the environment", "🔬 Science — experiments, research & discovering how things work", "🗣️ Debating, politics, current affairs & discussing ideas"],
-        "keywords": ["environment", "science", "sustainability", "research", "conservation", "data", "policy"],
-        "environment": ["🏕️ Outdoors / on-site", "🔬 Lab, studio or specialist facility", "🤝 Team-focused & collaborative"],
-        "values": ["🤝 Helping people / making impact", "📖 Continuous learning & growth", "🏆 Job satisfaction & purpose"],
-        "levels": [3, 4, 5, 6, 7],
-        "routes": [
-            "A Level/IB → Degree Apprenticeship → Junior Role",
-            "Uni → Master's → Research / Policy / NGO",
-            "Experience → Specialise → Senior / Consultant"
-        ],
-        "skills_to_build": ["Research", "Data Analysis", "Fieldwork", "Scientific Writing", "Advocacy", "Project Management"]
+        "skills_to_build": ["Excel", "Attention to Detail", "Analysis", "Organisation", "Communication"]
     }
 ]
 
 # ============================================================
-# MATCHING FUNCTION — FOR EVERYONE, FAIR & ACCURATE ✅
+# MATCHING FUNCTION
 # ============================================================
 def calculate_match(career):
     score = 0
@@ -541,7 +497,7 @@ if st.button("🔍 Find My Career Matches", type="primary", use_container_width=
         st.session_state.submitted = False
 
 # ============================================================
-# DISPLAY RESULTS — CLEAR, INSPIRING, ACTIONABLE ✅
+# DISPLAY RESULTS
 # ============================================================
 if st.session_state.results:
     top_results = st.session_state.results[:5]
@@ -582,56 +538,29 @@ if st.session_state.results:
         st.markdown("</div>", unsafe_allow_html=True)
 
     # ========================================================
-    # SUBMIT & SEE ALL RESPONSES — EVERYONE CAN CONTRIBUTE!
+    # SUBMIT — SAVE ANONYMOUSLY (ONLY YOU SEE IT)
     # ========================================================
     st.markdown("---")
-    st.subheader("📊 Be part of the PathPilot community")
-    st.write("Submit your results → see what EVERYONE else is discovering too! 💛")
-
-    col_submit, col_view = st.columns([1, 1])
-
-    with col_submit:
-        if not st.session_state.submitted:
-            if st.button("📋 Submit My Results", use_container_width=True, type="primary"):
-                top_matches = [r["career"]["name"] for r in st.session_state.results[:3]]
-                scores = [r["score"] for r in st.session_state.results[:3]]
-                response = {
-                    "time": datetime.now().strftime("%d/%m/%Y %H:%M"),
-                    "stage": ", ".join(pathway[:2]),
-                    "top_match": top_matches[0] if top_matches else "-",
-                    "match_score": scores[0] if scores else 0,
-                    "industry": ", ".join(industries[:2]) if industries else "-"
-                }
-                st.session_state.all_responses.append(response)
-                st.session_state.submitted = True
-                st.success("✅ Submitted! Thank you for being part of PathPilot! 💛")
-        else:
-            st.success("✅ Already submitted — thank you for contributing!")
-
-    with col_view:
-        if st.button("👁️ See All Community Results", use_container_width=True):
-            st.session_state.show_responses = not st.session_state.get("show_responses", False)
-
-    if st.session_state.get("show_responses", False):
-        st.markdown("---")
-        st.subheader(f"📋 Community Results — {len(st.session_state.all_responses)} people explored!")
-        if st.session_state.all_responses:
-            avg_score = round(sum(r["match_score"] for r in st.session_state.all_responses) / len(st.session_state.all_responses))
-            st.metric("📊 Average Match Score", f"{avg_score}%")
-            for i, resp in enumerate(reversed(st.session_state.all_responses), 1):
-                st.markdown(f"""
-                <div class="response-box">
-                <strong>#{len(st.session_state.all_responses) - i + 1}</strong> — {resp['time']}<br>
-                🎓 Stage: <em>{resp['stage']}</em><br>
-                🥇 Top Match: <strong>{resp['top_match']}</strong> ({resp['match_score']}%)<br>
-                🏭 Interests: {resp['industry']}
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            st.info("No responses yet — be the first! 🎉")
+    if not st.session_state.submitted:
+        st.subheader("📋 Submit your results")
+        st.write("This helps us make PathPilot better — completely anonymous, no personal info shared! 💛")
+        if st.button("✅ Submit My Results", type="primary", use_container_width=True):
+            top_match = st.session_state.results[0]["career"]["name"]
+            top_score = st.session_state.results[0]["score"]
+            st.session_state.submissions.append({
+                "time": datetime.now().strftime("%d/%m/%Y %H:%M"),
+                "stage": ", ".join(pathway[:2]) if pathway else "Not specified",
+                "top_match": top_match,
+                "top_score": top_score,
+                "industries": ", ".join(industries[:2]) if industries else "Not specified"
+            })
+            st.session_state.submitted = True
+            st.success("✅ Thank you! Your results have been submitted — anonymously! 💛")
+    else:
+        st.success("✅ Thank you for submitting! 💛")
 
 # ============================================================
-# FOOTER — YOUR SLOGAN
+# FOOTER
 # ============================================================
 st.markdown("---")
 st.caption("💛 PathPilot — Your path, your playbook. No wrong moves — just what works for YOU.")
